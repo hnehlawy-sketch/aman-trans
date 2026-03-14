@@ -11,9 +11,9 @@
 <title>أمان — ترجمة ذكية</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    VARIABLES + RESET
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 :root {
   --ink:#0b0f1a; --ink2:#111827; --ink3:#1a2235; --ink4:#1e2a40;
   --gold:#c9a84c; --gold2:#e8c97e;
@@ -31,9 +31,9 @@ body{
   overflow-x:hidden;
 }
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    AUTH SCREEN
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 #auth-screen{
   min-height:100dvh;display:flex;align-items:center;justify-content:center;
   padding:20px;
@@ -103,9 +103,9 @@ body{
 }
 .auth-err.show{display:block}
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    APP SHELL
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 #app-screen{display:none;min-height:100dvh;flex-direction:column}
 #app-screen.visible{display:flex}
 
@@ -190,9 +190,9 @@ body{
   /* Desktop: no bottom nav padding */
 }
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    STATS CARDS
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 .stats-row{
   display:grid;grid-template-columns:repeat(3,1fr);
   gap:10px;margin-bottom:20px;
@@ -207,9 +207,9 @@ body{
 }
 .s-lbl{font-size:.72rem;color:var(--muted);margin-top:4px}
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    FREE PLAN BANNER
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 .free-banner{
   background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);
   border-radius:10px;padding:12px 14px;margin-bottom:16px;
@@ -224,9 +224,9 @@ body{
   border:1px solid rgba(201,168,76,.25);
 }
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    OPT CHIPS
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 .opts-row{
   display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;
   overflow-x:auto;padding-bottom:2px;
@@ -247,9 +247,9 @@ body{
 }
 .opt-chip:active{transform:scale(.96)}
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    TEXT TRANSLATION
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 .text-card{
   background:var(--ink2);border:1px solid var(--border);
   border-radius:14px;overflow:hidden;margin-bottom:12px;
@@ -302,7 +302,7 @@ select:focus{border-color:var(--gold)}
 .btn-translate:active{transform:scale(.97)}
 .btn-translate:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
-/* Swap button between text cards */
+// Swap button between text cards //
 .swap-row{
   display:flex;align-items:center;justify-content:center;
   margin:-4px 0;position:relative;z-index:1;
@@ -325,9 +325,9 @@ select:focus{border-color:var(--gold)}
 .btn-icon:hover{background:rgba(255,255,255,.06);color:var(--text)}
 .btn-icon:active{transform:scale(.92)}
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    FILE TRANSLATION
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 .drop-zone{
   border:2px dashed var(--border2);border-radius:14px;
   padding:32px 20px;text-align:center;cursor:pointer;
@@ -393,7 +393,7 @@ input[type=range]::-webkit-slider-thumb{
 .fi-dot.e{background:var(--red);color:white}
 .fi-dot.c{background:var(--muted);color:var(--ink)}
 
-/* Progress */
+// Progress //
 .prog-card{
   background:var(--ink2);border:1px solid var(--border);
   border-radius:12px;padding:16px;margin-bottom:12px;
@@ -414,7 +414,7 @@ input[type=range]::-webkit-slider-thumb{
   font-size:.76rem;color:var(--muted);
 }
 
-/* Log */
+// Log //
 .log-card{
   background:var(--ink2);border:1px solid var(--border);
   border-radius:12px;overflow:hidden;margin-bottom:12px;
@@ -454,9 +454,9 @@ input[type=range]::-webkit-slider-thumb{
 .btn-danger{background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.25);color:var(--red)}
 .btn-sm{padding:7px 14px;font-size:.8rem}
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    PROFILE PAGE (bottom sheet style on mobile)
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 .overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;
   display:none;align-items:flex-end;justify-content:center;
@@ -485,16 +485,16 @@ input[type=range]::-webkit-slider-thumb{
 }
 .sheet-body{padding:18px 20px}
 
-/* Desktop: center modal */
+// Desktop: center modal //
 @media(min-width:641px){
   .overlay{align-items:center}
   .sheet{border-radius:20px;max-width:460px}
   .sheet-handle{display:none}
 }
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    PWA INSTALL BANNER
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 .pwa-banner{
   position:fixed;bottom:calc(var(--bottom-h) + var(--safe-bottom));left:12px;right:12px;
   z-index:200;background:var(--ink2);border:1px solid rgba(201,168,76,.3);
@@ -517,9 +517,9 @@ input[type=range]::-webkit-slider-thumb{
   cursor:pointer;font-size:18px;flex-shrink:0;padding:2px;
 }
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    MISC
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 .empty-state{text-align:center;padding:32px 16px;color:var(--muted)}
 .empty-state .ei{font-size:32px;opacity:.35;display:block;margin-bottom:8px}
 
@@ -529,13 +529,13 @@ input[type=range]::-webkit-slider-thumb{
 
 .divider{height:1px;background:var(--border);margin:14px 0}
 
-/* Alert */
+// Alert //
 .alert{padding:10px 14px;border-radius:9px;font-size:.82rem;margin-bottom:12px}
 .alert-ok{background:rgba(45,212,160,.07);border:1px solid rgba(45,212,160,.2);color:var(--green)}
 .alert-err{background:rgba(240,96,96,.07);border:1px solid rgba(240,96,96,.2);color:var(--red)}
 .alert-info{background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.2);color:var(--blue)}
 
-/* Toggle */
+// Toggle //
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
 .toggle-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,.04)}
 .toggle-info h4{font-size:.86rem;font-weight:700}
@@ -547,7 +547,7 @@ input[type=range]::-webkit-slider-thumb{
 .tg-thumb{position:absolute;top:3px;right:3px;width:14px;height:14px;background:var(--muted);border-radius:50%;transition:.25s}
 .toggle input:checked~.tg-thumb{right:21px;background:var(--green)}
 
-/* History item */
+// History item //
 .hist-item{
   display:flex;align-items:center;gap:12px;padding:12px 0;
   border-bottom:1px solid rgba(255,255,255,.04);
@@ -559,9 +559,9 @@ input[type=range]::-webkit-slider-thumb{
 .hist-meta{font-size:.72rem;color:var(--muted);margin-top:2px}
 .hist-date{font-size:.7rem;color:var(--muted);flex-shrink:0}
 
-/* ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
    DESKTOP OVERRIDES
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ //
 @media(min-width:768px){
   .bottom-nav{display:none}
   .page-content{
@@ -583,7 +583,7 @@ input[type=range]::-webkit-slider-thumb{
   .text-layout-desk{display:block}
 }
 
-/* Animations */
+// Animations //
 @keyframes rotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 @keyframes slideIn{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:translateX(0)}}
 @keyframes fi-pulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 10px rgba(201,168,76,.25)}}
