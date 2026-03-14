@@ -1,36 +1,52 @@
-# استخدام نسخة Node.js مستقرة وخفيفة
-FROM node:18-slim
+# ─────────────────────────────────────────────
+#  Aman  v4.0  —  Docker Image
+#  Multi-stage: Python deps + Node server
+#  Usage:
+#    docker build -t aman .
+#    docker run -p 3000:3000 -v $(pwd)/data:/app/backend/data aman
+# ─────────────────────────────────────────────
 
-# تثبيت متطلبات النظام (بايثون + أدوات الـ PDF + الخطوط العربية)
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
+FROM node:20-alpine AS base
+
+# Install Python + system deps for PDF processing
+RUN apk add --no-cache \
+    python3 py3-pip \
     wkhtmltopdf \
-    libxrender1 \
-    libfontconfig1 \
-    libxext6 \
-    fonts-liberation \
-    fonts-noto-core \
-    fonts-noto-cjk \
-    && rm -rf /var/lib/apt/lists/*
+    ttf-freefont \
+    msttcorefonts-installer \
+    fontconfig \
+    && update-ms-fonts \
+    && fc-cache -f 2>/dev/null || true
 
-# تحديد مسار العمل داخل الحاوية
-WORKDIR /app
-
-# نسخ ملفات المشروع بالكامل
-COPY . .
-
-# تثبيت مكتبات بايثون المطلوبة (بناءً على متطلبات v4.0)
-RUN pip3 install --no-cache-dir --break-system-packages \
+# Install Python packages
+RUN pip3 install --break-system-packages --no-cache-dir \
     python-docx \
     pdfplumber \
     pypdf \
     reportlab
 
-# إعداد المتغيرات البيئية (جوجل كلاود يستخدم المنفذ 8080 افتراضياً)
-ENV PORT=8080
-ENV NODE_ENV=production
-EXPOSE 8080
+WORKDIR /app
 
-# أمر تشغيل السيرفر (تأكد أن المسار لـ server.js صحيح)
+# Copy backend
+COPY backend/ ./backend/
+
+# Copy public (frontend)
+COPY public/ ./public/
+
+# Data directory (mounted as volume in production)
+RUN mkdir -p /app/backend/data
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:3000/api/health || exit 1
+
+# Environment
+ENV PORT=3000 \
+    NODE_ENV=production \
+    PYTHONIOENCODING=utf-8
+
+# Start
 CMD ["node", "backend/server.js"]

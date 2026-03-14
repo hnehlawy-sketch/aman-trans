@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+npm-debug.log
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+
+# Data files (use volume mounts in production)
+backend/data.json
+backend/*.json
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+
+# Temp uploads/outputs (use tmpdir)
+backend/uploads
+backend/outputs
+
+# Worker (not needed in Docker image)
+worker/
+
+# Dev files
+*.bak
+*.tmp

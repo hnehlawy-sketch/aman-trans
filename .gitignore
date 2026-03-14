@@ -1,0 +1,65 @@
+# ─── SECRETS — NEVER COMMIT THESE ────────────────────────────────
+# data.json contains hashed passwords, API keys, session tokens
+backend/data.json
+backend/data*.json
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.*
+
+# ─── Python ───────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.Python
+pip-log.txt
+
+# ─── Node ─────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn
+
+# ─── OS ───────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# ─── Temp files ───────────────────────────────────────────────────
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+.cache/
+
+# ─── IDE ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-workspace
+
+# ─── Logs ─────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── Upload/output dirs ───────────────────────────────────────────
+# These are OS temp dirs but just in case
+uploads/
+outputs/
+backend/uploads/
+backend/outputs/
+
+# ─── Docker ───────────────────────────────────────────────────────
+# Uncomment if you don't want Docker files tracked
+# Dockerfile
+# .dockerignore
+# docker-compose.yml

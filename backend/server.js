@@ -1,4 +1,16 @@
-
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *   Aman  v4.0  —  Full SaaS Server
+ *   Node.js · Zero npm deps
+ *   ✓ Auth + Rate-limit + Brute-force protection
+ *   ✓ SMTP email (any provider: Gmail, Outlook, custom)
+ *   ✓ Firebase Firestore (optional, falls back to data.json)
+ *   ✓ Deno/CF Worker proxy for Gemini (bypasses geo-blocks)
+ *   ✓ Translation jobs + history + cancel
+ *   ✓ Payment notifications + admin approval
+ *   ✓ Full admin panel
+ * ═══════════════════════════════════════════════════════════════
+ */
 
 'use strict';
 const http   = require('http');
@@ -14,12 +26,13 @@ const { execFile } = require('child_process');
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
-const PORT        = process.env.PORT || 8080;
+const PORT        = process.env.PORT || 3000;
 const IS_WIN      = process.platform === 'win32';
 const PYTHON      = IS_WIN ? 'python' : 'python3';
 const BASE_DIR    = __dirname;
 const PUBLIC_DIR  = path.join(BASE_DIR, '..', 'public');
-const DATA_FILE   = path.join(BASE_DIR, 'data.json');
+const DATA_DIR    = process.env.DATA_DIR || BASE_DIR;
+const DATA_FILE   = path.join(DATA_DIR, 'data.json');
 const UPLOAD_DIR  = path.join(os.tmpdir(), 'aman_uploads');
 const OUTPUT_DIR  = path.join(os.tmpdir(), 'aman_outputs');
 const MAX_FILE_B  = 50 * 1024 * 1024;
@@ -1243,6 +1256,30 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/admin' || pathname === '/admin.html') return serveHTML(res, 'admin.html');
   }
 
+    // PWA static files
+    if (M === 'GET' && pathname === '/manifest.json') {
+      const fp = path.join(PUBLIC_DIR, 'manifest.json');
+      if (fs.existsSync(fp)) {
+        res.writeHead(200, { 'Content-Type': 'application/manifest+json', ...CORS });
+        return fs.createReadStream(fp).pipe(res);
+      }
+    }
+    if (M === 'GET' && pathname === '/sw.js') {
+      const fp = path.join(PUBLIC_DIR, 'sw.js');
+      if (fs.existsSync(fp)) {
+        res.writeHead(200, { 'Content-Type': 'application/javascript', 'Service-Worker-Allowed': '/', ...CORS });
+        return fs.createReadStream(fp).pipe(res);
+      }
+    }
+    if (M === 'GET' && pathname.startsWith('/icons/')) {
+      const fp = path.join(PUBLIC_DIR, pathname);
+      if (fs.existsSync(fp)) {
+        res.writeHead(200, { 'Content-Type': 'image/png', ...CORS });
+        return fs.createReadStream(fp).pipe(res);
+      }
+    }
+
+
   let m;
   try {
     if (M==='POST' && pathname==='/api/auth/register')  return await hRegister(req,res);
@@ -1295,7 +1332,7 @@ async function start() {
   // Try to load from Firebase if configured
   if (useFirebase()) await loadFromFirebase();
 
-  server.listen(PORT, '0.0.0.0' , () => {
+  server.listen(PORT, () => {
     const line = '═'.repeat(44);
     console.log('\n  ' + line);
     console.log('  🛡️  Aman  v4.0  —  Full SaaS Server');
