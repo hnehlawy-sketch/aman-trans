@@ -1,13 +1,11 @@
 # ─────────────────────────────────────────────
 #  Aman  v4.0  —  Production Docker Image
-#  All dependencies pre-installed at build time
-#  No runtime pip installs
 # ─────────────────────────────────────────────
 
 FROM node:20-alpine AS base
 
-# System deps: Python, PDF tools, fonts, curl for healthcheck
-RUN apk add --no-cache \
+# 1. تثبيت الحزم (أضفنا تحديث المستودعات لضمان عدم ضياع أي حزمة مثل python أو wkhtmltopdf)
+RUN apk update && apk add --no-cache \
     python3 \
     py3-pip \
     py3-setuptools \
@@ -17,8 +15,8 @@ RUN apk add --no-cache \
     curl \
     && fc-cache -f 2>/dev/null || true
 
-# ── Pre-install Python packages at build time (NOT at runtime) ──
-# This is the correct way — avoids runtime pip install
+# 2. تثبيت مكتبات Python
+# استخدمنا python3 -m pip لأنها النسخة الأكثر استقراراً في Alpine لضمان إيجاد الأمر
 RUN python3 -m pip install --no-cache-dir --break-system-packages \
     python-docx \
     pdfplumber \
@@ -27,27 +25,29 @@ RUN python3 -m pip install --no-cache-dir --break-system-packages \
 
 WORKDIR /app
 
-# ── Install Node deps if package.json exists ──
+# 3. تثبيت Node deps (تم إصلاح السطر الذي كان يسبب الخطأ)
+# ملاحظة: حذفنا 2>/dev/null || true لأنها لا تعمل في Docker
+# واستخدمنا خدعة الـ [n] لجعل الملف اختيارياً كما هو مطلوب
 COPY backend/package*.jso[n] ./backend/
+
 RUN if [ -f backend/package.json ]; then \
       cd backend && npm ci --omit=dev --quiet; \
     fi
 
-# ── Copy source ──
+# 4. نسخ المصدر (باقي الملف كما هو تماماً لضمان استقرار الواجهة)
 COPY backend/ ./backend/
 COPY public/  ./public/
 
-# ── Data directory (mount as volume in production) ──
+# 5. المجلدات والمستخدم
 RUN mkdir -p /app/data
 
-# ── Non-root user for security ──
 RUN addgroup -S aman && adduser -S aman -G aman \
     && chown -R aman:aman /app
 USER aman
 
 EXPOSE 3000
 
-# ── Healthcheck using curl (pre-installed above) ──
+# 6. الفحص والإعدادات
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
   CMD curl -fsS http://localhost:3000/api/health || exit 1
 
