@@ -125,7 +125,7 @@ const { execFile } = require('child_process');
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
-const PORT        = process.env.PORT || 3000;
+const PORT        = process.env.PORT || 8080;
 const IS_WIN      = process.platform === 'win32';
 const PYTHON      = IS_WIN ? 'python' : 'python3';
 const BASE_DIR    = __dirname;
