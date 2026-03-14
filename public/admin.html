@@ -775,7 +775,6 @@ let currentSettings = {};
 
 const headers = () => ({ 'Content-Type':'application/json', 'Authorization':'Bearer ' + adminToken });
 
-// ── AUTH ──────────────────────────────────────────────────────────────────────
 async function checkAdminAuth() {
   const t = localStorage.getItem('aman_admin_token') || localStorage.getItem('aman_token');
   if (!t) return;
@@ -830,7 +829,6 @@ function adminLogout() {
   location.reload();
 }
 
-// ── NAVIGATION ────────────────────────────────────────────────────────────────
 const pages = ['overview','apikey','users','settings','plans','notifs','logs','smtp','worker','firebase'];
 
 function gotoPage(id) {
@@ -856,7 +854,6 @@ function gotoPage(id) {
   document.getElementById('page-alert').innerHTML = '';
 }
 
-// Fix nav active state
 function setNavActive(id) {
   document.querySelectorAll('.snav-item').forEach(el => el.classList.remove('active'));
   const labels = {overview:'نظرة عامة', apikey:'مفتاح API', users:'المستخدمون', settings:'الإعدادات', plans:'الخطط', notifs:'الإشعارات', logs:'سجل النشاط', smtp:'البريد SMTP', worker:'Worker AI', firebase:'Firebase'};
@@ -875,13 +872,11 @@ async function loadOverview() {
     document.getElementById('s-trans').textContent = fmt(d.totalTranslations);
     document.getElementById('s-words').textContent = fmt(d.totalWords);
     document.getElementById('s-active').textContent = d.activeJobs || 0;
-    // Show integration status
     const smtpBadge   = d.smtpReady     ? '<span class="tag tag-g">✓ SMTP</span>' : '<span class="tag tag-r">✗ SMTP</span>';
     const workerBadge = d.workerActive  ? '<span class="tag tag-g">✓ Worker</span>' : '<span class="tag" style="background:rgba(107,96,80,.15);color:var(--muted)">⬜ Worker</span>';
     const fbBadge     = d.firebaseActive? '<span class="tag tag-g">✓ Firebase</span>' : '<span class="tag" style="background:rgba(107,96,80,.15);color:var(--muted)">⬜ JSON Local</span>';
     const intRow = document.getElementById('integration-status');
     if (intRow) intRow.innerHTML = smtpBadge + ' ' + workerBadge + ' ' + fbBadge;
-    // Show pending payments count in overview
     if (d.pendingPayments > 0) {
       const badge = document.getElementById('notif-badge');
       if (badge) { badge.textContent = d.pendingPayments; badge.style.display = ''; }
@@ -902,7 +897,6 @@ async function loadOverview() {
       detail.innerHTML = '<div class="tag tag-r">✗ مفتاح API غير موجود</div><p style="font-size:.8rem;color:var(--muted);margin-top:8px;">يجب ضبط مفتاح Gemini لتعمل الترجمة.</p>';
     }
 
-    // Load recent users
     const ur = await fetch(`${API}/api/admin/users`, { headers: headers() });
     const ud = await ur.json();
     allUsers = ud.users || [];
@@ -920,7 +914,6 @@ async function loadOverview() {
         </tr>`).join('');
     }
 
-    // Load settings for toggles
     const sr = await fetch(`${API}/api/admin/settings`, { headers: headers() });
     const sd = await sr.json();
     currentSettings = sd;
@@ -930,7 +923,6 @@ async function loadOverview() {
   } catch (e) { showPageAlert('خطأ في تحميل البيانات: ' + e.message, 'err'); }
 }
 
-// ── API KEY ───────────────────────────────────────────────────────────────────
 async function loadApiKeyPage() {
   setNavActive('apikey');
   document.getElementById('key-save-alert').innerHTML = '';
@@ -942,7 +934,6 @@ async function loadApiKeyPage() {
     inp.value = d.geminiApiKey || '';
     inp.placeholder = d.geminiApiKey ? 'Set (masked) — enter new key to replace' : 'AIzaSy...';
     checkKeyStrength(inp.value);
-    // Load model
     const sel = document.getElementById('model-select');
     if (sel && d.geminiModel) sel.value = d.geminiModel;
   } catch (e) { showKeyAlert('Error: ' + e.message, 'err'); }
@@ -1055,7 +1046,6 @@ async function testApiKey() {
   }
 }
 
-// ── USERS ─────────────────────────────────────────────────────────────────────
 async function loadUsers() {
   setNavActive('users');
   try {
@@ -1108,7 +1098,6 @@ function renderUsers(users) {
 }
 
 function setExportAuth(e) {
-  // Add auth header via fetch-blob workaround
   e.preventDefault();
   fetch('/api/admin/export-users', { headers: headers() })
     .then(r => r.blob())
@@ -1157,7 +1146,6 @@ async function deleteUser(id, name) {
   else showPageAlert(d.error, 'err');
 }
 
-// ── SETTINGS ──────────────────────────────────────────────────────────────────
 async function loadSettings() {
   setNavActive('settings');
   try {
@@ -1204,7 +1192,6 @@ function cleanSessions() {
   showSettingsAlert('تم تنظيف الجلسات المنتهية (تلقائي عند إعادة التشغيل)', 'info');
 }
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
 function showPageAlert(msg, type) {
   const el = document.getElementById('page-alert');
   el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
@@ -1219,7 +1206,6 @@ function showSettingsAlert(msg, type) {
   setTimeout(() => el.innerHTML = '', 4000);
 }
 
-// ── PLANS & PAYMENTS ──────────────────────────────────────────────────────────
 
 let currentPlans = [];
 let currentPayments = [];
@@ -1236,7 +1222,6 @@ async function loadPlansPage() {
   } catch(e) { showPlansAlert('خطأ: ' + e.message, 'err'); }
 }
 
-// ── PLANS EDITOR ─────────────────────────────────────────────────────────────
 
 const CURRENCIES = ['USD','EUR','SAR','AED','KWD','EGP','TRY'];
 const PLAN_COLORS = ['#6b7280','#c9a84c','#60a5fa','#2dd4a0','#a78bfa','#f06060'];
@@ -1391,7 +1376,6 @@ function savePlan(i) {
   savePlansAndPayments();
 }
 
-// ── PAYMENTS EDITOR ───────────────────────────────────────────────────────────
 
 const PM_TYPES = [
   { value:'wallet', label:'محفظة إلكترونية', icon:'👝' },
@@ -1472,7 +1456,6 @@ function openPaymentModal(idx, m) {
       </div>
     </div></div>`;
   document.body.insertAdjacentHTML('beforeend', html);
-  // Store temp data
   window._pmTemp = Object.assign({}, m);
   updatePMFields();
 }
@@ -1554,7 +1537,6 @@ function closePMModal() {
   window._pmTemp = null;
 }
 
-// ── SAVE ALL ──────────────────────────────────────────────────────────────────
 async function savePlansAndPayments() {
   try {
     const r = await fetch(`${API}/api/admin/settings`, {
@@ -1576,7 +1558,6 @@ function showPlansAlert(msg, type) {
   setTimeout(() => el.innerHTML = '', 3000);
 }
 
-// ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
 
 var STATUS_LABELS = { pending:'⏳ قيد المراجعة', approved:'✅ موافق عليه', rejected:'❌ مرفوض' };
 var STATUS_COLORS = { pending:'tag-o', approved:'tag-g', rejected:'tag-r' };
@@ -1665,7 +1646,6 @@ async function rejectNotif(id) {
 }
 
 function showNotifDetail(id) {
-  // Find notif in DOM is hard - re-fetch
   fetch(`${API}/api/notifications`, { headers: headers() })
     .then(r => r.json())
     .then(d => {
@@ -1678,7 +1658,6 @@ function showNotifDetail(id) {
         n.updatedAt ? '🕐 آخر تحديث: ' + new Date(n.updatedAt).toLocaleString('ar-SA') : '',
       ].filter(Boolean).join('\n');
       alert(detail || 'لا توجد تفاصيل إضافية');
-      // Mark as read
       if (!n.read) fetch(`${API}/api/notifications/${id}`, {
         method: 'PUT', headers: headers(),
         body: JSON.stringify({ read: true })
@@ -1702,13 +1681,11 @@ async function updateBadge() {
   } catch(e) {}
 }
 
-// Poll for new notifications every 30 seconds
 setInterval(function() {
   if (adminToken) updateBadge();
 }, 30000);
 
 
-// ── ACTIVITY LOGS ──────────────────────────────────────────────────────────────
 const LOG_LABELS = {
   register:'📝 تسجيل', login:'🔑 دخول', logout:'🚪 خروج',
   profile_update:'✏️ تحديث ملف', payment_submit:'💳 دفعة جديدة',
@@ -1738,10 +1715,9 @@ async function loadLogs() {
   } catch(e) { console.error('loadLogs error:', e); }
 }
 
-var DB = null; // We don't have client-side DB, just use user names from allUsers
+var DB = null;
 
 
-// ── SMTP ──────────────────────────────────────────────────────────────────────
 async function loadSmtp() {
   setNavActive('smtp');
   try {
@@ -1791,7 +1767,6 @@ async function testSmtp() {
   } catch(e) { el.innerHTML = '<span style="color:var(--red)">❌ ' + e.message + '</span>'; }
 }
 
-// ── WORKER ─────────────────────────────────────────────────────────────────────
 async function loadWorker() {
   setNavActive('worker');
   try {
@@ -1827,7 +1802,6 @@ async function testWorker() {
   } catch(e) { el.innerHTML = '<span style="color:var(--red)">❌ ' + e.message + '</span>'; }
 }
 
-// ── FIREBASE ────────────────────────────────────────────────────────────────────
 async function loadFirebase() {
   setNavActive('firebase');
   try {
@@ -1878,7 +1852,6 @@ async function syncFirebase() {
   } catch(e) { el.innerHTML = '<span style="color:var(--red)">❌ ' + e.message + '</span>'; }
 }
 
-// ── SHARED ALERT HELPER ────────────────────────────────────────────────────────
 function showAlert(elId, msg, type) {
   const el = document.getElementById(elId);
   if (!el) return;
@@ -1886,7 +1859,6 @@ function showAlert(elId, msg, type) {
   setTimeout(() => { if(el) el.innerHTML = ''; }, 5000);
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
 checkAdminAuth();
 </script>
 </body>

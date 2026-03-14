@@ -295,27 +295,18 @@ function sm(m,r,c,v){if(r>=0&&r<m.length&&c>=0&&c<m.length)m[r][c]=v;}
 function build(text){
   var bytes=u8(text),v=ver(bytes.length),sz=SZ[v],m=mkM(v);
   var dc=buildCW(bytes,v),cw=interleave(dc,v);
-  // Finder patterns
   function finder(r,c){for(var i=0;i<7;i++)for(var j=0;j<7;j++)sm(m,r+i,c+j,(i===0||i===6||j===0||j===6)?1:(i>=2&&i<=4&&j>=2&&j<=4)?1:0);}
   finder(0,0);finder(0,sz-7);finder(sz-7,0);
-  // Separators
   for(var i=0;i<8;i++){sm(m,7,i,0);sm(m,i,7,0);sm(m,7,sz-1-i,0);sm(m,i,sz-8,0);sm(m,sz-8,i,0);sm(m,sz-1-i,7,0);}
-  // Timing
   for(var i=8;i<sz-8;i++){sm(m,6,i,i%2===0?1:0);sm(m,i,6,i%2===0?1:0);}
-  // Dark module
   m[4*v+9][8]=1;
-  // Alignment
   var ap=AL[v];if(ap)for(var ai=0;ai<ap.length;ai++)for(var bi2=0;bi2<ap.length;bi2++){var ar=ap[ai],ac=ap[bi2];if(m[ar][ac]!==null)continue;for(var dr=-2;dr<=2;dr++)for(var dc2=-2;dc2<=2;dc2++)sm(m,ar+dr,ac+dc2,(Math.abs(dr)===2||Math.abs(dc2)===2)?1:(dr===0&&dc2===0)?1:0);}
-  // Format info reserve
   var fp=[[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
   var fp2=[[sz-1,8],[sz-2,8],[sz-3,8],[sz-4,8],[sz-5,8],[sz-6,8],[sz-7,8],[8,sz-8],[8,sz-7],[8,sz-6],[8,sz-5],[8,sz-4],[8,sz-3],[8,sz-2],[8,sz-1]];
   for(var i=0;i<15;i++){if(m[fp[i][0]][fp[i][1]]===null)m[fp[i][0]][fp[i][1]]=0;if(m[fp2[i][0]][fp2[i][1]]===null)m[fp2[i][0]][fp2[i][1]]=0;}
-  // Place data
   var up=true,col=sz-1,bi=0,bytei=0;
   while(col>0){if(col===6)col--;for(var ri=0;ri<sz;ri++){var row=up?sz-1-ri:ri;for(var side=0;side<2;side++){var cc=col-side;if(m[row][cc]!==null)continue;var bit=bytei<cw.length?(cw[bytei]>>(7-bi))&1:0;m[row][cc]=bit;if(++bi===8){bi=0;bytei++;}}}up=!up;col-=2;}
-  // Mask 0
   for(var r=0;r<sz;r++)for(var c=0;c<sz;c++)if(m[r][c]!==null&&(r+c)%2===0)m[r][c]^=1;
-  // Format info
   var fi=FMT[0];
   for(var i=0;i<15;i++){var b=(fi>>(14-i))&1;m[fp[i][0]][fp[i][1]]=b;m[fp2[i][0]][fp2[i][1]]=b;}
   m[sz-8][8]=1;
@@ -361,7 +352,6 @@ var SYMS={USD:'$',EUR:'€',SAR:'ر.س',AED:'د.إ',KWD:'د.ك',EGP:'ج.م',TRY:
 var ICONS={free:'🆓',pro:'⭐',enterprise:'🏢'};
 var TYPE_ICONS={wallet:'👝',bank:'🏦',paypal:'🅿️',contact:'📞',other:'💳'};
 
-// ── Load ──────────────────────────────────────────────────────────────────────
 async function loadPlans(){
   try{
     var r=await fetch(API+'/api/plans');
@@ -412,7 +402,6 @@ function renderPlans(){
   }).join('');
 }
 
-// ── Modal open/close ──────────────────────────────────────────────────────────
 function selectPlan(id){
   var p=plans.find(function(x){return x.id===id;});
   if(!p)return;
@@ -423,7 +412,6 @@ function selectPlan(id){
   document.getElementById('m-amount').textContent=fmtP(calcP(p),p.currency)+(isYearly?'/سنة':'/شهر');
   goStep1();
   document.getElementById('pay-overlay').classList.add('open');
-  // Pre-fill user info if logged in
   tryPrefill();
 }
 
@@ -446,7 +434,6 @@ async function tryPrefill(){
   }catch(e){}
 }
 
-// ── Steps ────────────────────────────────────────────────────────────────────
 function setStep(n){
   curStep=n;
   [1,2,3].forEach(function(i){
@@ -479,7 +466,6 @@ function getCurrentMethod(){
   return payMethods[idx]||null;
 }
 
-// ── Build payment tabs ────────────────────────────────────────────────────────
 function buildTabs(){
   var tabs=document.getElementById('pm-tabs');
   var panels=document.getElementById('pm-panels');
@@ -498,34 +484,27 @@ function buildTabs(){
   });
   tabs.innerHTML=th;
   panels.innerHTML=ph;
-  // Render QR AFTER overlay opens and panel is visible
-  // Use a chain: wait for transition, then draw
   var firstWallet=payMethods.findIndex(function(m){return m.type==='wallet'&&m.walletNumber;});
   if(firstWallet>=0){
     drawQR(firstWallet);
   }
 }
 
-// KEY FIX: Draw QR with proper timing using MutationObserver + requestAnimationFrame
 function drawQR(idx){
   var m=payMethods[idx];
   if(!m||m.type!=='wallet'||!m.walletNumber)return;
-  // Try immediately first, retry after overlays fully visible
   function attempt(tries){
     var c=document.getElementById('qr-c-'+idx);
     if(!c){if(tries>0)setTimeout(function(){attempt(tries-1);},100);return;}
-    // Check if parent overlay is visible
     var overlay=document.getElementById('pay-overlay');
     var rect=c.getBoundingClientRect();
     if(rect.width===0||rect.height===0){
-      // Element not yet visible, wait
       if(tries>0)requestAnimationFrame(function(){attempt(tries-1);});
       return;
     }
     QRAman.draw(c,m.walletNumber,220,'🛡️');
     c._drawn=true;
   }
-  // Start attempting after overlay transition (300ms)
   setTimeout(function(){attempt(10);},350);
 }
 
@@ -591,7 +570,6 @@ function cLnk(href,ico,name,val){
 }
 function esc(s){return(s+'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 
-// ── Submit payment notification ───────────────────────────────────────────────
 async function submitPayment(){
   var name=document.getElementById('cf-name').value.trim();
   var email=document.getElementById('cf-email').value.trim();
@@ -633,21 +611,18 @@ async function submitPayment(){
       setStep(3);
     }else{
       var d=await r.json();
-      // If not logged in, still show success (admin will handle manually)
       if(r.status===401){
-        setStep(3);// Guest payment notification
+        setStep(3);
       }else{
         showToast('خطأ: '+(d.error||'فشل الإرسال'));
         btn.disabled=false;btn.innerHTML='✅ أرسلت الدفعة — أبلغ المدير';
       }
     }
   }catch(e){
-    // Network error - still show success screen
     setStep(3);
   }
 }
 
-// ── FAQ ───────────────────────────────────────────────────────────────────────
 var FAQS=[
   {q:'هل يمكنني إلغاء الاشتراك في أي وقت؟',a:'نعم، يمكنك إلغاء اشتراكك في أي وقت. لن يتجدد الاشتراك في الدورة التالية.'},
   {q:'هل بياناتي وملفاتي آمنة؟',a:'نعم. الملفات تُحذف تلقائياً بعد 3 ساعات. لا نخزن محتوى ملفاتك بشكل دائم.'},

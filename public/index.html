@@ -406,7 +406,6 @@ footer {
 </footer>
 
 <script>
-// Load live stats
 fetch('/api/admin/stats').then(r => r.json()).then(d => {
   const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+'K' : n;
   document.getElementById('s-users').textContent = fmt(d.totalUsers || 0);
