@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────
-#  Aman  v4.0  —  Stable UI Fixed
+#  Aman  v4.0  —  Final Stable UI
 # ─────────────────────────────────────────────
 
 FROM node:20-alpine AS base
@@ -27,14 +27,17 @@ RUN python3 -m pip install --no-cache-dir --break-system-packages \
 
 WORKDIR /app
 
-# 3. تثبيت اعتماديات Node داخل مجلد backend حصراً
-# ننسخ ملفات الـ package من مجلد backend إلى داخل الحاوية في نفس المسار
+# 3. تثبيت اعتماديات Node (إصلاح مسار المجلد)
+# ننشئ المجلد يدوياً لضمان وجوده
+RUN mkdir -p backend
+
+# ننسخ الملفات مباشرة داخل المجلد
 COPY backend/package*.json ./backend/
 
-# ندخل لمجلد backend ونثبت الحزم
-RUN cd backend && npm install --quiet
+# ننفذ التثبيت باستخدام --prefix بدلاً من cd، وهي طريقة أضمن في Docker
+RUN npm install --prefix backend --quiet
 
-# 4. نسخ بقية ملفات المشروع (تأكد أن المجلدات موجودة محلياً)
+# 4. نسخ بقية الملفات
 COPY backend/ ./backend/
 COPY public/  ./public/
 
@@ -51,5 +54,4 @@ ENV PORT=3000 \
     DATA_DIR=/app/data \
     PYTHONIOENCODING=utf-8
 
-# تشغيل السيرفر من المسار الصحيح
 CMD ["node", "backend/server.js"]
