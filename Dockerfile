@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────
-#  Aman  v4.0  —  Final Custom Build
+#  Aman  v4.0  —  The Nuclear Option
 # ─────────────────────────────────────────────
 
 FROM node:20-alpine AS base
@@ -20,15 +20,11 @@ RUN python3 -m pip install --no-cache-dir --break-system-packages \
 
 WORKDIR /app
 
-# 4. تثبيت حزم الـ Node.js (الخاصة بالـ backend فقط كما في صورتك)
-# نستخدم خدعة الـ [n] الآمنة جداً في Docker بدلاً من 2>/dev/null
-COPY backend/package*.jso[n] ./backend/
-
-# الدخول لمجلد backend وتثبيت الحزم
-RUN cd backend && npm install --quiet
-
-# 5. نسخ كل ملفات المشروع (public, worker, backend) دفعة واحدة
+# 4. الحل الجذري: ننسخ كل شيء أولاً! (لا مجال للهروب الآن يا Docker)
 COPY . .
+
+# 5. ندخل لمجلد backend ونثبت الحزم (الملفات موجودة 100% الآن)
+RUN cd backend && npm install --quiet
 
 # 6. إعداد الصلاحيات والأمان
 RUN mkdir -p /app/data && \
