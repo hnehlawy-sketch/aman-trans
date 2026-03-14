@@ -1,25 +1,25 @@
 # ─────────────────────────────────────────────
 #  Aman  v4.0  —  Production Docker Image
+#  All dependencies pre-installed at build time
+#  No runtime pip installs
 # ─────────────────────────────────────────────
 
 FROM node:20-alpine AS base
 
-# 1. تحديث المستودعات وتثبيت الحزم (مع إضافة مستودع community لضمان وجود wkhtmltopdf)
+# System deps: Python, PDF tools, fonts, curl for healthcheck
 RUN apk add --no-cache \
     python3 \
     py3-pip \
     py3-setuptools \
-    # تيفات وأدوات الخطوط
+    wkhtmltopdf \
     ttf-freefont \
     fontconfig \
-    dbus \
     curl \
-    # إضافة wkhtmltopdf من مستودع الـ edge/community إذا لم تكن في الرسمي
-    && apk add --no-cache wkhtmltopdf --repository http://dl-cdn.alpinelinux.org/alpine/v3.18/community/ \
     && fc-cache -f 2>/dev/null || true
 
-# 2. تثبيت حزم Python بشكل منفصل لضمان الوضوح
-RUN python3 -m pip install --no-cache-dir --break-system-packages \
+# ── Pre-install Python packages at build time (NOT at runtime) ──
+# This is the correct way — avoids runtime pip install
+RUN python3 install --no-cache-dir --break-system-packages \
     python-docx \
     pdfplumber \
     pypdf \
@@ -27,23 +27,29 @@ RUN python3 -m pip install --no-cache-dir --break-system-packages \
 
 WORKDIR /app
 
-# 3. تثبيت اعتماديات Node (طريقة آمنة واختيارية)
-COPY backend/package*.jso[n] ./backend/
+# ── Install Node deps if package.json exists ──
+COPY backend/package*.json ./backend/ 2>/dev/null || true
 RUN if [ -f backend/package.json ]; then \
       cd backend && npm ci --omit=dev --quiet; \
     fi
 
-# 4. نسخ ملفات المشروع
+# ── Copy source ──
 COPY backend/ ./backend/
 COPY public/  ./public/
 
-# 5. إعداد المجلدات والمستخدم
-RUN mkdir -p /app/data && \
-    addgroup -S aman && adduser -S aman -G aman && \
-    chown -R aman:aman /app
+# ── Data directory (mount as volume in production) ──
+RUN mkdir -p /app/data
 
+# ── Non-root user for security ──
+RUN addgroup -S aman && adduser -S aman -G aman \
+    && chown -R aman:aman /app
 USER aman
+
 EXPOSE 3000
+
+# ── Healthcheck using curl (pre-installed above) ──
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD curl -fsS http://localhost:3000/api/health || exit 1
 
 ENV PORT=3000 \
     NODE_ENV=production \
