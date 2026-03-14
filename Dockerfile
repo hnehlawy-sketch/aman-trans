@@ -28,7 +28,7 @@ RUN python3 -m pip install --no-cache-dir --break-system-packages \
 WORKDIR /app
 
 # ── Install Node deps if package.json exists ──
-COPY backend/package*.jso[n] ./backend/ 2>/dev/null || true
+COPY backend/package*.jso[n] ./backend/
 RUN if [ -f backend/package.json ]; then \
       cd backend && npm ci --omit=dev --quiet; \
     fi
