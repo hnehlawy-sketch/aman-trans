@@ -1,5 +1,4 @@
 //
- / ═══════════════════════════════════════════════════════════════
  /   Aman  v4.0  —  Full SaaS Server
  /   Node.js · Zero npm deps
  /   ✓ Auth + Rate-limit + Brute-force protection
@@ -9,7 +8,6 @@
  /   ✓ Translation jobs + history + cancel
  /   ✓ Payment notifications + admin approval
  /   ✓ Full admin panel
- / ═══════════════════════════════════════════════════════════════
  //
 
 'use strict';
@@ -23,9 +21,9 @@ const os     = require('os');
 const crypto = require('crypto');
 const { execFile } = require('child_process');
 
-// ═══════════════════════════════════════════════════════════════
+//
 // CONFIG
-// ═══════════════════════════════════════════════════════════════
+//
 const PORT        = process.env.PORT || 3000;
 const IS_WIN      = process.platform === 'win32';
 const PYTHON      = IS_WIN ? 'python' : 'python3';
@@ -46,9 +44,9 @@ const RATE_XLAT_MAX   = 20;
 
 [UPLOAD_DIR, OUTPUT_DIR].forEach(d => fs.mkdirSync(d, { recursive: true }));
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // HELPERS
-// ═══════════════════════════════════════════════════════════════
+// 
 const uid    = () => crypto.randomBytes(16).toString('hex');
 const tok    = () => crypto.randomBytes(32).toString('hex');
 const hash   = (pw, salt) => crypto.pbkdf2Sync(pw, salt, 100000, 64, 'sha512').toString('hex');
@@ -106,9 +104,9 @@ function getIP(req) {
     .split(',')[0].trim());
 }
 
-// ═══════════════════════════════════════════════════════════════
+//
 // RATE LIMITER
-// ═══════════════════════════════════════════════════════════════
+//
 const _ipWin  = new Map();
 const _usrWin = new Map();
 
@@ -127,11 +125,11 @@ function limitUser(uid, res) {
   return true;
 }
 
-// ═══════════════════════════════════════════════════════════════
+//
 // DATA STORE  (JSON local  OR  Firebase Firestore)
-// ═══════════════════════════════════════════════════════════════
+//
 
-// ── Default settings structure ───────────────────────────────
+// Default settings structure
 function defaultSettings() {
   return {
     geminiApiKey: '', geminiModel: 'gemini-2.5-flash',
@@ -162,7 +160,7 @@ function defaultSettings() {
   };
 }
 
-// ── Local JSON store ──────────────────────────────────────────
+// Local JSON store 
 function initLocal() {
   const salt = crypto.randomBytes(16).toString('hex');
   const id   = uid();
@@ -239,7 +237,7 @@ function addLog(action, userId = '', detail = '') {
   if (DB.activityLog.length > 500) DB.activityLog = DB.activityLog.slice(-500);
 }
 
-// ── Firebase Firestore adapter ────────────────────────────────
+//  Firebase Firestore adapter
 // Calls Firebase REST API — no npm needed
 // Only activated when settings.useFirebase = true AND firebaseProject/Key set
 
@@ -411,7 +409,7 @@ const Firebase = {
   },
 };
 
-// ── DB proxy: routes to Firebase or local ────────────────────
+//  DB proxy: routes to Firebase or local 
 function useFirebase() {
   return DB.settings.useFirebase && DB.settings.firebaseProject && DB.settings.firebaseKey;
 }
@@ -453,9 +451,9 @@ async function loadFromFirebase() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // SMTP EMAIL  (pure Node.js, no nodemailer needed)
-// ═══════════════════════════════════════════════════════════════
+// 
 
 function smtpReady() {
   const s = DB.settings;
@@ -712,9 +710,9 @@ async function sendEmail(to, type, data = {}) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
+//
 // GEMINI  (direct OR via Worker proxy)
-// ═══════════════════════════════════════════════════════════════
+// 
 const LANGS = {
   auto:'Auto-detect',ar:'Arabic',en:'English',fr:'French',de:'German',
   es:'Spanish',zh:'Chinese (Simplified)',ja:'Japanese',ru:'Russian',
@@ -839,9 +837,9 @@ async function translate(text, src, tgt, apiKey, opts = {}) {
   return results.join('\n\n');
 }
 
-// ═══════════════════════════════════════════════════════════════
+//
 // MULTIPART PARSER  (size-limited, DoS-resistant)
-// ═══════════════════════════════════════════════════════════════
+// 
 const MAX_BODY_MP  = 55 * 1024 * 1024;  // 55 MB total body
 const MAX_FIELD_SZ = 64  * 1024;        // 64 KB per text field
 const MAX_FIELDS   = 32;                // max text fields
@@ -922,9 +920,9 @@ function parseMultipart(req) {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // SESSION / AUTH
-// ═══════════════════════════════════════════════════════════════
+// 
 function createSession(userId, remember = false) {
   const t = tok(), ttl = remember ? 30 * 24 * 60 * 60 * 1000 : SESSION_TTL;
   DB.sessions[t] = { userId, exp: now() + ttl };
@@ -943,9 +941,9 @@ function mustAuth (req, res) { const u = getUser(req); if (!u) { json(res, 401, 
 function mustAdmin(req, res) { const u = getUser(req); if (!u || u.role !== 'admin') { json(res, 403, { error: 'Admin only' }); return null; } return u; }
 const safeUser = u => ({ id:u.id, name:u.name, email:u.email, role:u.role, plan:u.plan, translations:u.translations||0, words:u.words||0, createdAt:u.createdAt });
 
-// ═══════════════════════════════════════════════════════════════
+//
 // PYTHON RUNNER
-// ═══════════════════════════════════════════════════════════════
+//
 function runPy(script, args, ms = 120000) {
   return new Promise((ok, fail) => {
     const fp = path.join(BASE_DIR, script);
@@ -964,9 +962,9 @@ function runPy(script, args, ms = 120000) {
 const BIN_EXT = new Set(['.pdf','.docx','.doc']);
 const isBin   = n => BIN_EXT.has(path.extname(n).toLowerCase());
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // JOB STORE
-// ═══════════════════════════════════════════════════════════════
+// 
 const JOBS = new Map();
 
 async function runJob(jobId) {
@@ -1031,9 +1029,9 @@ setInterval(() => {
   }
 }, 3_600_000);
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // HANDLERS — AUTH
-// ═══════════════════════════════════════════════════════════════
+// 
 async function hRegister(req, res) {
   try {
     if (!DB.settings.allowRegistration) return json(res, 403, { error: 'Registration is closed' });
@@ -1108,9 +1106,9 @@ function hHistory(req, res) {
   json(res, 200, { history: (u.history || []).slice().reverse() });
 }
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // HANDLERS — TRANSLATION
-// ═══════════════════════════════════════════════════════════════
+// 
 async function hTranslateText(req, res) {
   const u = mustAuth(req, res); if (!u) return;
   if (!limitUser(u.id, res)) return;
@@ -1208,9 +1206,9 @@ function hDownloadAll(res, jobId, u) {
   json(res, 200, { textFiles, binaryFiles, total: done.length });
 }
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // HANDLERS — ADMIN
-// ═══════════════════════════════════════════════════════════════
+// 
 function hAdminStats(req, res) {
   const u = mustAdmin(req, res); if (!u) return;
   let activeJobs = 0; JOBS.forEach(j => { if (j.status === 'running') activeJobs++; });
@@ -1350,9 +1348,9 @@ async function hFirebaseSync(req, res) {
   } catch (e) { json(res, 500, { error: e.message }); }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // HANDLERS — NOTIFICATIONS / PAYMENTS
-// ═══════════════════════════════════════════════════════════════
+// 
 function hGetNotifs(req, res) {
   const u = mustAdmin(req, res); if (!u) return;
   json(res, 200, { notifications: (DB.notifications || []).slice().reverse() });
@@ -1414,9 +1412,9 @@ function hNotifCount(req, res) {
 function hPlans(req, res)  { json(res, 200, { plans: DB.settings.plans || [], paymentMethods: DB.settings.paymentMethods || [] }); }
 function hHealth(req, res) { json(res, 200, { status: 'ok', version: '4.0.0', platform: process.platform, uptime: Math.round(process.uptime()), apiKeySet: !!DB.settings.geminiApiKey, model: DB.settings.geminiModel, smtpReady: smtpReady(), workerActive: !!(DB.settings.useWorker && DB.settings.workerUrl), firebaseActive: useFirebase() }); }
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // ROUTER
-// ═══════════════════════════════════════════════════════════════
+// 
 const server = http.createServer(async (req, res) => {
   const { pathname } = url.parse(req.url, true);
   const M = req.method.toUpperCase();
@@ -1513,9 +1511,9 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // START
-// ═══════════════════════════════════════════════════════════════
+// 
 async function start() {
   // Try to load from Firebase if configured
   if (useFirebase()) await loadFromFirebase();
