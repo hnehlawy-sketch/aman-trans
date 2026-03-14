@@ -63,3 +63,7 @@ backend/outputs/
 # Dockerfile
 # .dockerignore
 # docker-compose.yml
+
+# Node modules (never commit)
+backend/node_modules/
+node_modules/

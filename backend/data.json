@@ -1,50 +1,14 @@
 {
   "users": {
-    "8e8e2ccb566c4624bb831233c655cf7a": {
-      "id": "8e8e2ccb566c4624bb831233c655cf7a",
+    "c5f567998a54fdce8e3c7042b24c6d8b": {
+      "id": "c5f567998a54fdce8e3c7042b24c6d8b",
       "email": "admin@aman.app",
-      "passwordHash": "ba80ceeb786af107960967efe75fa21c1aec899c1a39dcb149258fc1af2eda67bbb0072e92ee9b01bd23e74130bbef666edbd4f24c853dca58142c32107a44f7",
-      "salt": "da7e040f98190c751f912f52a4fa92e1",
+      "passwordHash": "3b60c48cd1ae939553b2811839029617bf2f28a0db2c64e10189a878b6910b96fdd351d1829701da04901af895a889599c0b2abb407cad772a0da02fc1a870d3",
+      "salt": "e27e114ad6b1355e0fc52b51fbd929dc",
       "name": "Admin",
       "role": "admin",
       "plan": "pro",
-      "createdAt": 1773447503182,
-      "translations": 2,
-      "words": 4,
-      "loginAttempts": 0,
-      "lockedUntil": 0,
-      "history": [
-        {
-          "id": "f93637f998f28c7f931c8266b391ddaf",
-          "src": "en",
-          "tgt": "ar",
-          "chars": 13,
-          "words": 2,
-          "ts": 1773447605184,
-          "type": "text",
-          "preview": "Hello, world!"
-        },
-        {
-          "id": "7deaf2f00d543a4a78cae588e33618a5",
-          "src": "en",
-          "tgt": "ar",
-          "chars": 13,
-          "words": 2,
-          "ts": 1773447618510,
-          "type": "text",
-          "preview": "Hello, world!"
-        }
-      ]
-    },
-    "d2669a7d57c5b4febacbaaf6351c75eb": {
-      "id": "d2669a7d57c5b4febacbaaf6351c75eb",
-      "email": "h.nehlawy@gmail.com",
-      "name": "hani",
-      "passwordHash": "e81a4d5b9fa0933263ccab3522c191a1aae721c7bce64096c76cad0b7c11540a284d89711f815a416466970d2246831900661d2fc5eb453d74c720a85bc6855a",
-      "salt": "37a63b5ec2f123654dcddfa5ff5751e4",
-      "role": "user",
-      "plan": "pro",
-      "createdAt": 1773448154567,
+      "createdAt": 1773516307124,
       "translations": 0,
       "words": 0,
       "loginAttempts": 0,
@@ -53,17 +17,13 @@
     }
   },
   "sessions": {
-    "35e7c6b151aa7b26e85ad145d55cb56e1c63fd4e739263dc13b64c921e01c72b": {
-      "userId": "8e8e2ccb566c4624bb831233c655cf7a",
-      "exp": 1774052341434
-    },
-    "f6ad7d9c156466c8b380a505faa57e86bb0c59ec5ddaa403ef2005c533813e07": {
-      "userId": "d2669a7d57c5b4febacbaaf6351c75eb",
-      "exp": 1774052954568
+    "9a9988454ab78a9952f90cf8993ccd597dcb5a7c3bd9de353d1aa4d5417c3210": {
+      "userId": "c5f567998a54fdce8e3c7042b24c6d8b",
+      "exp": 1774121173827
     }
   },
   "settings": {
-    "geminiApiKey": "AIzaSyBe5a8QECGhVh35mTYE4v3essISr2AZprs",
+    "geminiApiKey": "",
     "geminiModel": "gemini-2.5-flash",
     "workerUrl": "",
     "workerSecret": "",
@@ -77,9 +37,9 @@
     "emailOnRegister": true,
     "emailOnPaymentApproved": true,
     "emailOnPaymentReceived": true,
-    "firebaseProject": "aman-edu",
-    "firebaseKey": "{\n  \"type\": \"service_account\",\n  \"project_id\": \"aman-edu\",\n  \"private_key_id\": \"f6f1e615f7ffa199033e99dbf50d5d4d0c7f1263\",\n  \"private_key\": \"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCs2YrQgUikCLjI\\nOdw94lUCEaCX6y9jjr0ZPyCgtCoGuVowOpzaXCE2mQ5O8874/qKGm+Frs6qqz9jV\\nF6zaOmKlESkeKn48iHu513qJuNmMs/pk5JLEyeRfyYxyHK7DR6iBPcnmIlWYIVao\\nE/S/w+RQwzUCJkW8ModIXvWc+ogovZCaR0XsGtrz9MLzxvbX/h60YVOTc6YDaSsd\\nNNPj3d2U1F6K+poqltBqx2vE8v4tXPPHxSywZSCVFvdB//ZhBtHnayQwyVFTjs7A\\niX2e8jnelbszy7ic/ChLpF3JwLa1QU0Br89scEwPsKWWCWTsq9Ix8ZZya6ymqBcX\\nwVnoLYjNAgMBAAECggEAIG6SCATWBSc4yqLmovrqceCuVgr0IZVJAGlynQyo/Ql+\\ntWFuCF+0gKrPvzsqaNhYVPL/JSb5PSMSH4uZbHn7g9bYNPeKp5+BPZHDhX9YXHjx\\noMgtjLyH+/wUfN3KYcw6fwOBtEtZbZnFyXQzHl8qYgf6lHxrZcBCV28v3SQ585Cs\\nxK4LSYUGVBr6xUzY1t64LjjjTMH2oYQxcKHbDIHn//BDX+sfYt7FTBDkzGW8zVf/\\nkf0BVDSkWYeRPnivv6EjdJZh1JMQG+QDjxHXOciVjJUZxjVr92SokakoMkumeTRC\\ni31etDOJM2Ctg+3R/7C1vcoHOs0+Kh9I37W5jqKogQKBgQDmJQ8XMS5qSgJpWLlK\\nP7s4lhmJIrmChgXEYqUmAadaGmEoyLmz8sp0orV2/kahf4Imz+7fv8DX0amJTAbA\\njEbJ0+lgBqBxmJ6XWGbrj+9VkCCXzDo3hLImuXzQ8dL09Yr7VMQVFsk0Wq0oLP9N\\nAlY+zblhN6YsXWivsBKH2isWTQKBgQDARK9dLh3HJXzaWheODKwIBGl5hAk3AJsW\\nJNlk0ENbw9nCukEJ5qpPwyHWmp7eEyq62zXIglM3PwoBSujDp+DQUHeFIza1kDSv\\nMdpVprGWr7fxUwwzINJzkQE4l4pPxpkm/158YeY/Yj3kqvrzD6mobbkJpPT1Jf9v\\nFk/LSVJ8gQKBgGyfiSPVHqckD0dRjQKyWdc3YQ4MyaoFP6uVM4VgunAYi0sIkj2Q\\nlmW+dg+XrBaFbBSNh50rkAVM+8vFilpO2wpfboLYHdn/wrqECu+bm8ayo++BgOi7\\nRKpqWbL0sDDVw6ckNvgNLSH8ukWAF29tbu9tgdWUwmWmIMbrP5PHMRbxAoGAZI0H\\nMTIG/LlMPF1VaEKUTXURPC2jLBKzCLeowaJxN7KLVd1WWjk55JDmR3eBkh5wAFzY\\nGc6eeowLTXXBmWFYn1kVyJkL6ZRLGTx3NMgCpA2toxWNkceeiDXTb6dA/EuemNiA\\nr4f7hDZ6q/YHW8pbLeyEEtkkCnkexxfiDyx/aQECgYEAnLM4rlUm0zRT8hxBrIfD\\nWNC8M1LytLxQ7S8RsEFUvGWUgy7MOnQO9YU9/SDEGYEANhkinqirxvGk8X56E0ff\\nrEwSfiELwMmYOnDEwCGcOMmLAAF4O8kaMs6iOOhOC9E5/R8+wvXqHraXlS4eFPDp\\nJjyFevSfvWAHCtBlbu5UOmQ=\\n-----END PRIVATE KEY-----\\n\",\n  \"client_email\": \"firebase-adminsdk-fbsvc@aman-edu.iam.gserviceaccount.com\",\n  \"client_id\": \"108082830986870923820\",\n  \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",\n  \"token_uri\": \"https://oauth2.googleapis.com/token\",\n  \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",\n  \"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40aman-edu.iam.gserviceaccount.com\",\n  \"universe_domain\": \"googleapis.com\"\n}",
-    "useFirebase": true,
+    "firebaseProject": "",
+    "firebaseKey": "",
+    "useFirebase": false,
     "allowRegistration": true,
     "freePlanEnabled": true,
     "freeCharsLimit": 500,
@@ -147,69 +107,27 @@
         "description": "للفرق والشركات الكبيرة"
       }
     ],
-    "paymentMethods": [
-      {
-        "type": "wallet",
-        "name": "شام كاش",
-        "id": "pm_1773448001373",
-        "walletNumber": "06465430216403",
-        "notes": ""
-      }
-    ]
+    "paymentMethods": []
   },
   "stats": {
-    "totalTranslations": 2,
-    "totalWords": 4
+    "totalTranslations": 0,
+    "totalWords": 0
   },
-  "notifications": [
-    {
-      "id": "d4dc3c129edb674fe8e773a645ad4910",
-      "type": "payment",
-      "status": "approved",
-      "userId": "d2669a7d57c5b4febacbaaf6351c75eb",
-      "userName": "hani",
-      "userEmail": "h.nehlawy@gmail.com",
-      "planId": "pro",
-      "planName": "احترافي",
-      "amount": "$9.99/شهر",
-      "method": "شام كاش",
-      "payerName": "hani",
-      "payerEmail": "h.nehlawy@gmail.com",
-      "ref": "3135131321",
-      "note": "الدافع: hani (h.nehlawy@gmail.com)\nطريقة الدفع: شام كاش\nمرجع الدفع: 3135131321\n",
-      "createdAt": 1773448174334,
-      "read": true,
-      "updatedAt": 1773448188251
-    }
-  ],
+  "notifications": [],
   "activityLog": [
     {
-      "id": "7099e4087ba8b4cfda2d0d2a41f125ac",
+      "id": "6737f00334014b4056c24e2e22afb151",
       "action": "login",
-      "userId": "8e8e2ccb566c4624bb831233c655cf7a",
+      "userId": "c5f567998a54fdce8e3c7042b24c6d8b",
       "detail": "::1",
-      "ts": 1773447541435
+      "ts": 1773516373827
     },
     {
-      "id": "b599c717c20c3ac7ae0b69cc6f8d48ae",
-      "action": "register",
-      "userId": "d2669a7d57c5b4febacbaaf6351c75eb",
-      "detail": "h.nehlawy@gmail.com",
-      "ts": 1773448154568
-    },
-    {
-      "id": "6727920c49c90f7ff1511c4ed308e8ca",
-      "action": "payment_submit",
-      "userId": "d2669a7d57c5b4febacbaaf6351c75eb",
-      "detail": "Plan: pro, $9.99/شهر",
-      "ts": 1773448174334
-    },
-    {
-      "id": "b0619b47c92f34efe9c9168316c32812",
-      "action": "payment_approved",
-      "userId": "8e8e2ccb566c4624bb831233c655cf7a",
-      "detail": "User: h.nehlawy@gmail.com",
-      "ts": 1773448188251
+      "id": "4cb7ac2cf0d53cabff91b477b42b5432",
+      "action": "login",
+      "userId": "c5f567998a54fdce8e3c7042b24c6d8b",
+      "detail": "::1",
+      "ts": 1773516463177
     }
   ]
 }

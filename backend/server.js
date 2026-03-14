@@ -1,3 +1,16 @@
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *   Aman  v4.0  —  Full SaaS Server
+ *   Node.js · Zero npm deps
+ *   ✓ Auth + Rate-limit + Brute-force protection
+ *   ✓ SMTP email (any provider: Gmail, Outlook, custom)
+ *   ✓ Firebase Firestore (optional, falls back to data.json)
+ *   ✓ Deno/CF Worker proxy for Gemini (bypasses geo-blocks)
+ *   ✓ Translation jobs + history + cancel
+ *   ✓ Payment notifications + admin approval
+ *   ✓ Full admin panel
+ * ═══════════════════════════════════════════════════════════════
+ */
 
 'use strict';
 const http   = require('http');
@@ -187,7 +200,29 @@ function loadLocal() {
 }
 
 let DB = loadLocal();
-function saveDB() { fs.writeFileSync(DATA_FILE, JSON.stringify(DB, null, 2), 'utf8'); }
+let _saveTimer = null;
+let _saving = false;
+let _saveQueue = false;
+
+function saveDB() {
+  // Debounce: batch writes within 200ms window
+  if (_saving) { _saveQueue = true; return; }
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    _saving = true;
+    const tmp = DATA_FILE + '.tmp';
+    try {
+      fs.writeFileSync(tmp, JSON.stringify(DB, null, 2), 'utf8');
+      fs.renameSync(tmp, DATA_FILE); // atomic rename
+    } catch (e) {
+      slog('saveDB error:', e.message);
+      try { fs.unlinkSync(tmp); } catch {}
+    } finally {
+      _saving = false;
+      if (_saveQueue) { _saveQueue = false; saveDB(); }
+    }
+  }, 200);
+}
 
 // Session cleanup every hour
 setInterval(() => {
@@ -432,79 +467,188 @@ function sendSmtp(to, subject, html) {
     if (!smtpReady()) return fail(new Error('SMTP not configured'));
     const s    = DB.settings;
     const port = parseInt(s.smtpPort) || 587;
-    const sock = s.smtpSecure
-      ? require('tls').connect(port, s.smtpHost, { rejectUnauthorized: false })
-      : net.createConnection(port, s.smtpHost);
 
-    let buf = '', step = 0, upgraded = false;
-
-    const send = (line) => {
-      sock.write(line + '\r\n');
-    };
-
-    const b64 = (v) => Buffer.from(v).toString('base64');
-
-    // Build message
+    const b64 = v => Buffer.from(String(v)).toString('base64');
     const boundary = uid();
-    const textVersion = html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    const textBody = html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    const crlf = '\r\n';
     const msg = [
       `From: =?UTF-8?B?${b64('أمان')}?= <${s.smtpFrom}>`,
       `To: ${to}`,
       `Subject: =?UTF-8?B?${b64(subject)}?=`,
-      `MIME-Version: 1.0`,
+      'MIME-Version: 1.0',
       `Content-Type: multipart/alternative; boundary="${boundary}"`,
-      ``,
+      '',
       `--${boundary}`,
-      `Content-Type: text/plain; charset=UTF-8`,
-      `Content-Transfer-Encoding: base64`,
-      ``,
-      b64(textVersion),
+      'Content-Type: text/plain; charset=UTF-8',
+      'Content-Transfer-Encoding: base64',
+      '',
+      b64(textBody),
       `--${boundary}`,
-      `Content-Type: text/html; charset=UTF-8`,
-      `Content-Transfer-Encoding: base64`,
-      ``,
+      'Content-Type: text/html; charset=UTF-8',
+      'Content-Transfer-Encoding: base64',
+      '',
       b64(html),
       `--${boundary}--`,
-    ].join('\r\n');
+    ].join(crlf);
 
-    const handleLine = (line) => {
+    const STEP_TIMEOUT = 15000;
+    let stepTimer = null;
+    let done = false;
+    let tlsSock = null;
+
+    function cleanup(err) {
+      if (done) return;
+      done = true;
+      clearTimeout(stepTimer);
+      try { (tlsSock || sock).destroy(); } catch {}
+      err ? fail(err) : ok();
+    }
+
+    function resetTimer() {
+      clearTimeout(stepTimer);
+      stepTimer = setTimeout(() => cleanup(new Error('SMTP step timeout')), STEP_TIMEOUT);
+    }
+
+    function write(sock2, line) {
+      slog('SMTP >', line.slice(0, 40));
+      sock2.write(line + crlf);
+      resetTimer();
+    }
+
+    const sock = net.createConnection(port, s.smtpHost);
+    sock.setTimeout(STEP_TIMEOUT);
+    sock.on('timeout', () => cleanup(new Error('SMTP connection timeout')));
+    sock.on('error', cleanup);
+    resetTimer();
+
+    let state = 'CONNECT';
+    let activeSock = sock;
+
+    function onLine(line) {
+      if (done) return;
+      const code = parseInt(line.slice(0, 3));
+      const cont = line[3] === '-'; // multi-line response
+      if (cont) return; // wait for final line
       slog('SMTP <', line.slice(0, 80));
-      const code = parseInt(line);
+      resetTimer();
 
-      // STARTTLS upgrade
-      if (code === 220 && line.includes('STARTTLS') && !upgraded && !s.smtpSecure) {
-        send('STARTTLS'); return;
-      }
-      if (code === 220 && step === 0) { step = 1; send('EHLO aman'); return; }
-      if (code === 220 && step > 0 && !upgraded) {
-        upgraded = true;
-        const tlsSock = require('tls').connect({ socket: sock, rejectUnauthorized: false }, () => {
-          sock.removeAllListeners('data');
-          tlsSock.on('data', d => d.toString().split('\r\n').filter(Boolean).forEach(handleLine));
-          send('EHLO aman');
-        });
-        return;
-      }
-      if (code === 250 && step === 1) { step = 2; send(`AUTH LOGIN`); return; }
-      if (code === 334 && step === 2) { step = 3; send(b64(s.smtpUser)); return; }
-      if (code === 334 && step === 3) { step = 4; send(b64(s.smtpPass)); return; }
-      if (code === 235 && step === 4) { step = 5; send(`MAIL FROM:<${s.smtpFrom}>`); return; }
-      if (code === 250 && step === 5) { step = 6; send(`RCPT TO:<${to}>`); return; }
-      if (code === 250 && step === 6) { step = 7; send('DATA'); return; }
-      if (code === 354 && step === 7) { step = 8; send(msg + '\r\n.'); return; }
-      if (code === 250 && step === 8) { step = 9; send('QUIT'); sock.destroy(); ok(); return; }
-      if (code === 221) { sock.destroy(); ok(); return; }
-      if (code >= 400)  { sock.destroy(); fail(new Error(`SMTP ${code}: ${line}`)); return; }
-    };
+      try {
+        switch (state) {
+          case 'CONNECT':
+            if (code !== 220) return cleanup(new Error(`SMTP banner: ${line}`));
+            state = 'EHLO1';
+            write(activeSock, `EHLO ${s.smtpHost || 'localhost'}`);
+            break;
 
-    sock.on('data', d => d.toString().split('\r\n').filter(Boolean).forEach(handleLine));
-    sock.on('error', fail);
-    sock.on('timeout', () => { sock.destroy(); fail(new Error('SMTP timeout')); });
-    sock.setTimeout(20000);
+          case 'EHLO1':
+            if (code !== 250) return cleanup(new Error(`EHLO failed: ${line}`));
+            if (!s.smtpSecure) {
+              state = 'STARTTLS';
+              write(activeSock, 'STARTTLS');
+            } else {
+              state = 'AUTH';
+              write(activeSock, 'AUTH LOGIN');
+            }
+            break;
+
+          case 'STARTTLS':
+            if (code !== 220) {
+              // No STARTTLS — try plain AUTH (some servers)
+              state = 'AUTH';
+              write(activeSock, 'AUTH LOGIN');
+              return;
+            }
+            // Upgrade to TLS
+            tlsSock = require('tls').connect({
+              socket: activeSock,
+              host: s.smtpHost,
+              rejectUnauthorized: false,
+            }, () => {
+              activeSock = tlsSock;
+              state = 'EHLO2';
+              write(tlsSock, `EHLO ${s.smtpHost || 'localhost'}`);
+            });
+            tlsSock.on('error', cleanup);
+            // Re-route line reader
+            let buf2 = '';
+            tlsSock.on('data', d => {
+              buf2 += d.toString();
+              buf2.split('\r\n').filter(Boolean).forEach(l => { if (!l.endsWith('-')) onLine(l); });
+              buf2 = buf2.endsWith('\r\n') ? '' : buf2.split('\r\n').pop();
+            });
+            break;
+
+          case 'EHLO2':
+            if (code !== 250) return cleanup(new Error(`EHLO2 failed: ${line}`));
+            state = 'AUTH';
+            write(activeSock, 'AUTH LOGIN');
+            break;
+
+          case 'AUTH':
+            if (code !== 334) return cleanup(new Error(`AUTH failed: ${line}`));
+            state = 'USER';
+            write(activeSock, b64(s.smtpUser));
+            break;
+
+          case 'USER':
+            if (code !== 334) return cleanup(new Error(`USER prompt failed: ${line}`));
+            state = 'PASS';
+            write(activeSock, b64(s.smtpPass));
+            break;
+
+          case 'PASS':
+            if (code !== 235) return cleanup(new Error(`Auth rejected (wrong credentials?): ${line}`));
+            state = 'MAIL';
+            write(activeSock, `MAIL FROM:<${s.smtpFrom}>`);
+            break;
+
+          case 'MAIL':
+            if (code !== 250) return cleanup(new Error(`MAIL FROM rejected: ${line}`));
+            state = 'RCPT';
+            write(activeSock, `RCPT TO:<${to}>`);
+            break;
+
+          case 'RCPT':
+            if (code !== 250 && code !== 251) return cleanup(new Error(`RCPT TO rejected: ${line}`));
+            state = 'DATA';
+            write(activeSock, 'DATA');
+            break;
+
+          case 'DATA':
+            if (code !== 354) return cleanup(new Error(`DATA rejected: ${line}`));
+            state = 'BODY';
+            write(activeSock, msg + crlf + '.');
+            break;
+
+          case 'BODY':
+            if (code !== 250) return cleanup(new Error(`Message rejected: ${line}`));
+            state = 'QUIT';
+            write(activeSock, 'QUIT');
+            break;
+
+          case 'QUIT':
+            cleanup(null); // success
+            break;
+
+          default:
+            cleanup(new Error(`Unexpected SMTP state ${state}: ${line}`));
+        }
+      } catch (e) { cleanup(e); }
+    }
+
+    let buf = '';
+    sock.on('data', d => {
+      if (tlsSock) return; // TLS socket handles its own data
+      buf += d.toString();
+      const lines = buf.split('\r\n');
+      buf = lines.pop(); // incomplete line
+      lines.filter(Boolean).forEach(onLine);
+    });
   });
 }
 
-// Email templates
+
 function emailTemplates(type, data = {}) {
   const brand = `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:560px;margin:0 auto">
     <div style="background:linear-gradient(135deg,#0b0f1a,#1a2235);padding:28px 32px;border-radius:12px 12px 0 0;text-align:center">
@@ -696,8 +840,13 @@ async function translate(text, src, tgt, apiKey, opts = {}) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MULTIPART PARSER
+// MULTIPART PARSER  (size-limited, DoS-resistant)
 // ═══════════════════════════════════════════════════════════════
+const MAX_BODY_MP  = 55 * 1024 * 1024;  // 55 MB total body
+const MAX_FIELD_SZ = 64  * 1024;        // 64 KB per text field
+const MAX_FIELDS   = 32;                // max text fields
+const MAX_FILES_MP = 60;                // max file parts
+
 function bufIdx(buf, needle, start = 0) {
   outer: for (let i = start; i <= buf.length - needle.length; i++) {
     for (let j = 0; j < needle.length; j++) if (buf[i+j] !== needle[j]) continue outer;
@@ -708,29 +857,68 @@ function bufIdx(buf, needle, start = 0) {
 
 function parseMultipart(req) {
   return new Promise((ok, fail) => {
-    const chunks = [];
-    req.on('data', c => chunks.push(c));
+    const chunks = []; let totalSize = 0;
+
+    req.on('data', c => {
+      totalSize += c.length;
+      if (totalSize > MAX_BODY_MP) {
+        req.destroy();
+        return fail(new Error(`Upload too large (limit ${Math.round(MAX_BODY_MP/1024/1024)}MB)`));
+      }
+      chunks.push(c);
+    });
+
     req.on('end', () => {
       try {
         const body  = Buffer.concat(chunks);
-        const bm    = (req.headers['content-type'] || '').match(/boundary=([^\s;]+)/);
-        if (!bm) return fail(new Error('No boundary'));
+        const bm    = (req.headers['content-type'] || '').match(/boundary=["']?([^"';\s]+)["']?/);
+        if (!bm) return fail(new Error('No multipart boundary'));
         const bound = Buffer.from('--' + bm[1]);
         const parts = []; let start = 0;
+        let fieldCount = 0, fileCount = 0;
+
         while (start < body.length) {
-          const bp = bufIdx(body, bound, start); if (bp === -1) break;
+          const bp = bufIdx(body, bound, start);
+          if (bp === -1) break;
+          // Final boundary check
+          if (body.slice(bp + bound.length, bp + bound.length + 2).toString() === '--') break;
+
           const hs = bp + bound.length + 2;
-          const he = bufIdx(body, Buffer.from('\r\n\r\n'), hs); if (he === -1) break;
+          const he = bufIdx(body, Buffer.from('\r\n\r\n'), hs);
+          if (he === -1) break;
+
           const hdrs = body.slice(hs, he).toString();
-          const ds = he + 4, nb = bufIdx(body, bound, ds), de = nb !== -1 ? nb - 2 : body.length;
-          const nm = hdrs.match(/name="([^"]+)"/), fm = hdrs.match(/filename="([^"]+)"/);
-          if (nm) parts.push({ name: nm[1], filename: fm ? fm[1] : null, data: body.slice(ds, de), hdrs });
+          const ds   = he + 4;
+          const nb   = bufIdx(body, bound, ds);
+          const de   = nb !== -1 ? nb - 2 : body.length;
+          const nm   = hdrs.match(/name="([^"]{1,256})"/);
+          const fm   = hdrs.match(/filename="([^"]{0,512})"/);
+          if (!nm) { start = nb !== -1 ? nb : body.length; continue; }
+
+          if (fm) {
+            // File part
+            if (++fileCount > MAX_FILES_MP)
+              return fail(new Error(`Too many files (max ${MAX_FILES_MP})`));
+            const data = body.slice(ds, de);
+            if (data.length > MAX_FILE_B)
+              return fail(new Error(`File "${fm[1]}" exceeds ${Math.round(MAX_FILE_B/1024/1024)}MB`));
+            parts.push({ name: nm[1], filename: fm[1], data, hdrs });
+          } else {
+            // Text field
+            if (++fieldCount > MAX_FIELDS)
+              return fail(new Error(`Too many fields (max ${MAX_FIELDS})`));
+            const data = body.slice(ds, Math.min(de, ds + MAX_FIELD_SZ));
+            parts.push({ name: nm[1], filename: null, data, hdrs });
+          }
+
           start = nb !== -1 ? nb : body.length;
         }
         ok(parts);
       } catch (e) { fail(e); }
     });
+
     req.on('error', fail);
+    req.setTimeout(120000, () => { req.destroy(); fail(new Error('Upload timeout')); });
   });
 }
 
@@ -1247,21 +1435,34 @@ const server = http.createServer(async (req, res) => {
     if (M === 'GET' && pathname === '/manifest.json') {
       const fp = path.join(PUBLIC_DIR, 'manifest.json');
       if (fs.existsSync(fp)) {
-        res.writeHead(200, { 'Content-Type': 'application/manifest+json', ...CORS });
+        res.writeHead(200, {
+          'Content-Type': 'application/manifest+json',
+          'Cache-Control': 'public, max-age=86400',
+          ...CORS
+        });
         return fs.createReadStream(fp).pipe(res);
       }
     }
     if (M === 'GET' && pathname === '/sw.js') {
       const fp = path.join(PUBLIC_DIR, 'sw.js');
       if (fs.existsSync(fp)) {
-        res.writeHead(200, { 'Content-Type': 'application/javascript', 'Service-Worker-Allowed': '/', ...CORS });
+        res.writeHead(200, {
+          'Content-Type': 'application/javascript',
+          'Service-Worker-Allowed': '/',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          ...CORS
+        });
         return fs.createReadStream(fp).pipe(res);
       }
     }
     if (M === 'GET' && pathname.startsWith('/icons/')) {
       const fp = path.join(PUBLIC_DIR, pathname);
       if (fs.existsSync(fp)) {
-        res.writeHead(200, { 'Content-Type': 'image/png', ...CORS });
+        res.writeHead(200, {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=604800',
+          ...CORS
+        });
         return fs.createReadStream(fp).pipe(res);
       }
     }

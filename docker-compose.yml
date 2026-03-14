@@ -8,27 +8,24 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      # Persist data.json outside container
-      - ./data:/app/backend/data
+      # Persist data outside container (never delete this folder!)
+      - ./data:/app/data
     environment:
       - PORT=3000
       - NODE_ENV=production
-      - DATA_DIR=/app/backend/data
+      - DATA_DIR=/app/data
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
 
-  # Optional: nginx reverse proxy (uncomment to use)
+  # Uncomment to add nginx reverse proxy:
   # nginx:
   #   image: nginx:alpine
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
+  #   ports: ["80:80","443:443"]
   #   volumes:
-  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf
-  #     - ./ssl:/etc/nginx/ssl
-  #   depends_on:
-  #     - aman
+  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - ./ssl:/etc/nginx/ssl:ro
+  #   depends_on: [aman]

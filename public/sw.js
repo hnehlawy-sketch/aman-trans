@@ -1,71 +1,96 @@
 /**
- * Aman Service Worker  v4.0
- * - Caches static assets for offline use
- * - Network-first for API calls
- * - Stale-while-revalidate for pages
+ * Aman Service Worker  v4.1
+ * Fixes: proper caching strategy, no broken precache
  */
 
-const CACHE    = 'aman-v4';
-const PRECACHE = [
-  '/',
+const CACHE_NAME = 'aman-v4.1';
+const STATIC_ASSETS = [
   '/app',
-  '/pricing',
   '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
 ];
 
-// Install: pre-cache shell pages
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting())
+// ── Install ───────────────────────────────────────────────────────────────────
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        // Cache each individually so one failure doesn't break all
+        return Promise.allSettled(
+          STATIC_ASSETS.map(url =>
+            cache.add(url).catch(err => console.warn('SW: failed to cache', url, err))
+          )
+        );
+      })
+      .then(() => self.skipWaiting())
   );
 });
 
-// Activate: clean old caches
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+// ── Activate ──────────────────────────────────────────────────────────────────
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(k => k !== CACHE_NAME)
+          .map(k => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch strategy
-self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
+// ── Fetch ─────────────────────────────────────────────────────────────────────
+self.addEventListener('fetch', event => {
+  const { request } = event;
+  const url = new URL(request.url);
 
-  // API calls: network only (never cache)
+  // Only handle same-origin requests
+  if (url.origin !== location.origin) return;
+
+  // API calls — always network, never cache
   if (url.pathname.startsWith('/api/')) {
-    e.respondWith(fetch(e.request));
+    event.respondWith(fetch(request));
     return;
   }
 
-  // Static assets (js/css/fonts): cache-first
-  if (/\.(js|css|woff2?|ttf|png|ico|svg)(\?|$)/.test(url.pathname)) {
-    e.respondWith(
-      caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return res;
-      }))
+  // Icons & static files — cache first, then network
+  if (
+    url.pathname.startsWith('/icons/') ||
+    url.pathname === '/manifest.json' ||
+    url.pathname === '/sw.js'
+  ) {
+    event.respondWith(
+      caches.match(request).then(cached => {
+        if (cached) return cached;
+        return fetch(request).then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(c => c.put(request, clone));
+          }
+          return response;
+        });
+      })
     );
     return;
   }
 
-  // HTML pages: network-first, fall back to cache
-  e.respondWith(
-    fetch(e.request)
-      .then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return res;
-      })
-      .catch(() => caches.match(e.request).then(cached => cached || caches.match('/')))
-  );
-});
-
-// Background sync (future: queue translations)
-self.addEventListener('sync', e => {
-  if (e.tag === 'sync-translations') {
-    // placeholder for offline queue
+  // HTML pages — network first, fall back to cache
+  if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(c => c.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(request)
+            .then(cached => cached || caches.match('/app'))
+        )
+    );
+    return;
   }
 });

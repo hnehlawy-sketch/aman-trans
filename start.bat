@@ -7,8 +7,7 @@ echo.
 echo [1/4] Checking Node.js...
 node --version >nul 2>&1
 if errorlevel 1 (
-  echo  ERROR: Node.js not found!
-  echo  Download from: https://nodejs.org
+  echo  ERROR: Node.js not found. Download: https://nodejs.org
   pause & exit /b 1
 )
 echo  Node.js OK
@@ -16,37 +15,28 @@ echo  Node.js OK
 echo [2/4] Checking Python...
 python --version >nul 2>&1
 if errorlevel 1 (
-  echo  ERROR: Python not found!
-  echo  Download from: https://python.org
+  echo  ERROR: Python not found. Download: https://python.org
   pause & exit /b 1
 )
 echo  Python OK
 
-echo [3/4] Installing Python libraries...
-python -m pip install --quiet python-docx pdfplumber pypdf reportlab
-echo  Libraries OK
-
-echo [4/4] Checking wkhtmltopdf (for Arabic PDF support)...
-wkhtmltopdf --version >nul 2>&1
+echo [3/4] Checking Python libraries...
+python -c "import docx, pdfplumber, pypdf, reportlab" >nul 2>&1
 if errorlevel 1 (
-  echo  NOTE: wkhtmltopdf not found - Arabic PDF may show boxes
-  echo  For perfect Arabic PDF support, download from:
-  echo  https://wkhtmltopdf.org/downloads.html
+  echo  Installing missing Python libraries...
+  python -m pip install --quiet python-docx pdfplumber pypdf reportlab
+  echo  Libraries installed.
 ) else (
-  echo  wkhtmltopdf OK - Arabic PDF support enabled!
+  echo  Python libraries OK
 )
 
+echo [4/4] Starting server...
 echo.
-echo  ================================
-echo  Open browser at:
-echo  http://localhost:3000
-echo  http://localhost:3000/app
-echo  http://localhost:3000/pricing
-echo  http://localhost:3000/admin
-echo  ================================
-echo  Admin: admin@aman.app / Admin@1234
+echo  Open: http://localhost:3000
+echo  Admin: http://localhost:3000/admin
+echo  NOTE: Install wkhtmltopdf for Arabic PDF support
+echo  Download: https://wkhtmltopdf.org/downloads.html
 echo.
-
 cd backend
 node server.js
 pause
