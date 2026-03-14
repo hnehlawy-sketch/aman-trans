@@ -9,34 +9,13 @@ npm-debug.log
 # Python cache
 __pycache__
 *.pyc
-*.pyo
-*.pyd
-.Python
-*.egg-info
 
-# Data files (use volume mounts in production)
+# Data files - تم تعديلها لتسمح بملفات الـ package
 backend/data.json
-backend/*.json
+# احذف السطر backend/*.json القديم
 
 # Logs
 *.log
 
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode
-.idea
-*.swp
-
-# Temp uploads/outputs (use tmpdir)
-backend/uploads
-backend/outputs
-
-# Worker (not needed in Docker image)
+# Worker (بما أنك تجاهلته هنا، تأكد أنك لا تحتاجه في السيرفر)
 worker/
-
-# Dev files
-*.bak
-*.tmp
