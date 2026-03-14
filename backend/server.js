@@ -48,10 +48,10 @@ cd backend && node server.js
 
 | الصفحة | الرابط |
 |--------|--------|
-| الرئيسية | http://localhost:3000 |
-| التطبيق | http://localhost:3000/app |
-| الأسعار | http://localhost:3000/pricing |
-| الإدارة | http://localhost:3000/admin |
+| الرئيسية | http://localhost:8080 |
+| التطبيق | http://localhost:8080/app |
+| الأسعار | http://localhost:8080/pricing |
+| الإدارة | http://localhost:8080/admin |
 
 **بيانات الأدمن الافتراضية:** `admin@aman.app` / `Admin@1234`
 ⚠️ **غيّر كلمة المرور فوراً من لوحة الإدارة!**
@@ -125,7 +125,7 @@ const { execFile } = require('child_process');
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
-const PORT        = process.env.PORT || 3000;
+const PORT        = process.env.PORT || 8080;
 const IS_WIN      = process.platform === 'win32';
 const PYTHON      = IS_WIN ? 'python' : 'python3';
 const BASE_DIR    = __dirname;
