@@ -19,7 +19,7 @@ RUN apk add --no-cache \
 
 # ── Pre-install Python packages at build time (NOT at runtime) ──
 # This is the correct way — avoids runtime pip install
-RUN python3 install --no-cache-dir --break-system-packages \
+RUN python3 -m pip install --no-cache-dir --break-system-packages \
     python-docx \
     pdfplumber \
     pypdf \
