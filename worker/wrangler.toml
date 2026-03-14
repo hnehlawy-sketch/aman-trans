@@ -1,0 +1,10 @@
+name = "aman-ai-worker"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Set these in Cloudflare dashboard → Workers → Settings → Variables
+# [vars]
+# AMAN_SECRET = "change-this-to-random-secret-123"
+
+# Or use wrangler secrets:
+# wrangler secret put AMAN_SECRET

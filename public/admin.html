@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أمان — لوحة الإدارة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#07090f; --ink2:#0e1420; --ink3:#141c2c; --ink4:#1a2438;
+  --gold:#c9a84c; --gold2:#e8c97e; --gold3:#f5e4a8;
+  --green:#2dd4a0; --red:#f06060; --blue:#60a5fa; --orange:#fb923c;
+  --text:#ddd7cc; --muted:#6b6050; --border:#1e2a3e; --border2:#263347;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--ink);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── ADMIN AUTH ──── */
+#admin-auth{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse 60% 60% at 50% 30%,rgba(201,168,76,.06),transparent);
+}
+.admin-auth-box{
+  width:100%;max-width:400px;background:var(--ink2);border:1px solid var(--border);
+  border-radius:20px;padding:40px;position:relative;overflow:hidden;
+}
+.admin-auth-box::before{content:'';position:absolute;top:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.admin-badge{
+  display:inline-flex;align-items:center;gap:8px;background:rgba(240,96,96,.07);
+  border:1px solid rgba(240,96,96,.2);color:var(--red);padding:5px 14px;
+  border-radius:100px;font-size:.78rem;font-weight:700;margin-bottom:20px;
+}
+.auth-logo2{display:flex;align-items:center;gap:11px;margin-bottom:24px}
+.auth-logo2-icon{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#6b4510);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 20px rgba(201,168,76,.25)}
+.auth-logo2-title{font-size:1.2rem;font-weight:900;color:var(--gold2)}
+.auth-logo2-sub{font-size:.75rem;color:var(--muted)}
+.f-input{width:100%;background:var(--ink3);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;transition:all .2s;margin-bottom:12px}
+.f-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+label.f-label{display:block;font-size:.78rem;font-weight:700;color:var(--muted);margin-bottom:5px}
+.btn-admin-login{width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.95rem;font-weight:800;background:linear-gradient(135deg,var(--gold),#9a6f18);color:var(--ink);transition:all .25s;margin-top:4px}
+.btn-admin-login:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(201,168,76,.3)}
+.btn-admin-login:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.auth-err{background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.25);color:var(--red);border-radius:8px;padding:9px 13px;font-size:.82rem;margin-bottom:12px;display:none}
+.auth-err.show{display:block}
+
+/* ── ADMIN SHELL ──── */
+#admin-shell{display:none;min-height:100vh;flex-direction:row}
+
+.sidebar{
+  width:240px;min-height:100vh;background:var(--ink2);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:22px 18px;border-bottom:1px solid var(--border)}
+.sb-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#8b5e1a);display:flex;align-items:center;justify-content:center;font-size:16px}
+.sb-title{font-size:1rem;font-weight:900;color:var(--gold2)}
+.sb-sub{font-size:.7rem;color:var(--muted)}
+.sidebar-nav{flex:1;padding:12px 10px}
+.snav-section{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 10px 5px}
+.snav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;
+  font-size:.86rem;font-weight:600;color:var(--muted);cursor:pointer;
+  transition:all .2s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:right;font-family:'Tajawal',sans-serif;
+}
+.snav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.snav-item.active{color:var(--text);background:var(--ink4);border-left:3px solid var(--gold)}
+.snav-icon{width:20px;text-align:center;flex-shrink:0}
+.sidebar-footer{padding:14px 16px;border-top:1px solid var(--border)}
+.admin-chip{display:flex;align-items:center;gap:9px;background:var(--ink3);border:1px solid var(--border);border-radius:10px;padding:9px 12px;margin-bottom:10px}
+.admin-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--orange));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white}
+.admin-name{font-size:.82rem;font-weight:700}
+.admin-role{font-size:.68rem;color:var(--red);font-weight:700}
+.btn-logout{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(240,96,96,.2);background:transparent;color:var(--red);font-family:'Tajawal',sans-serif;font-size:.82rem;cursor:pointer;transition:all .2s}
+.btn-logout:hover{background:rgba(240,96,96,.07)}
+
+.main-area{flex:1;overflow-y:auto;padding:32px}
+
+/* ── TOPBAR ──── */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.topbar h1{font-size:1.5rem;font-weight:800}
+.topbar .sub{font-size:.82rem;color:var(--muted);margin-top:2px}
+.api-status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:.78rem;font-weight:700}
+.api-ok{background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2);color:var(--green)}
+.api-miss{background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.2);color:var(--red)}
+.dot{width:7px;height:7px;border-radius:50%}
+.dot-g{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot-r{background:var(--red);box-shadow:0 0 6px var(--red)}
+
+/* ── STAT CARDS ──── */
+.stats4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.sc{background:var(--ink2);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:50%;opacity:.06;filter:blur(20px)}
+.sc.gc::after{background:var(--gold)} .sc.gg::after{background:var(--green)} .sc.gb::after{background:var(--blue)} .sc.gr::after{background:var(--red)}
+.sc-icon{font-size:22px;margin-bottom:10px}
+.sc-num{font-family:'IBM Plex Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--gold2);line-height:1}
+.sc-lbl{font-size:.76rem;color:var(--muted);margin-top:5px}
+
+/* ── PANELS ──── */
+.panels2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.panel{background:var(--ink2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.panel-h{padding:13px 18px;background:var(--ink3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:.85rem;font-weight:700}
+.panel-b{padding:18px}
+
+/* ── API KEY PANEL ──── */
+.api-key-wrap{position:relative;margin-bottom:14px}
+.api-key-wrap .f-input{padding-left:40px;margin-bottom:0;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;font-size:.82rem}
+.api-vis-btn{position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0}
+.api-key-hint{font-size:.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6}
+.api-key-hint a{color:var(--blue);text-decoration:none}
+.api-key-hint a:hover{text-decoration:underline}
+.key-strength{height:3px;border-radius:3px;margin-bottom:12px;transition:all .3s}
+
+/* ── SETTINGS ──── */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-info h4{font-size:.88rem;font-weight:700}
+.setting-info p{font-size:.76rem;color:var(--muted);margin-top:2px}
+.toggle{position:relative;width:42px;height:23px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--ink4);border:1px solid var(--border);border-radius:100px;transition:.3s}
+.toggle input:checked+.toggle-track{background:rgba(45,212,160,.2);border-color:var(--green)}
+.toggle-thumb{position:absolute;top:3px;right:3px;width:15px;height:15px;background:var(--muted);border-radius:50%;transition:.3s}
+.toggle input:checked~.toggle-thumb{right:22px;background:var(--green)}
+.num-input{width:90px;background:var(--ink3);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:.85rem;outline:none;text-align:center}
+.num-input:focus{border-color:var(--gold)}
+
+/* ── USERS TABLE ──── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+th{text-align:right;padding:10px 14px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--ink3)}
+td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.03)}
+tr:hover td{background:rgba(255,255,255,.02)}
+tr:last-child td{border-bottom:none}
+.plan-badge,.role-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:100px;font-size:.7rem;font-weight:800}
+.plan-free{background:rgba(107,96,80,.15);color:var(--muted)}
+.plan-pro{background:rgba(201,168,76,.12);color:var(--gold2)}
+.role-admin{background:rgba(240,96,96,.1);color:var(--red)}
+.role-user{background:rgba(96,165,250,.08);color:var(--blue)}
+.tbl-actions{display:flex;gap:6px}
+.tbl-btn{padding:4px 10px;border-radius:7px;font-size:.74rem;font-weight:700;cursor:pointer;border:none;font-family:'Tajawal',sans-serif;transition:all .15s}
+.tbl-btn-upgrade{background:rgba(201,168,76,.1);color:var(--gold2);border:1px solid rgba(201,168,76,.2)}
+.tbl-btn-upgrade:hover{background:rgba(201,168,76,.2)}
+.tbl-btn-del{background:rgba(240,96,96,.07);color:var(--red);border:1px solid rgba(240,96,96,.2)}
+.tbl-btn-del:hover{background:rgba(240,96,96,.15)}
+.user-cell{display:flex;align-items:center;gap:9px}
+.user-av-sm{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple,#a78bfa));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0}
+
+/* ── SEARCH & FILTER ──── */
+.table-controls{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-icon{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+.search-input{width:100%;background:var(--ink3);border:1px solid var(--border);color:var(--text);padding:8px 32px 8px 12px;border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.84rem;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--gold)}
+.filter-select{background:var(--ink3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.82rem;outline:none}
+
+/* ── BUTTONS ──── */
+.btn{padding:9px 18px;border-radius:9px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:700;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:linear-gradient(135deg,var(--gold),#9a6f18);color:var(--ink)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(201,168,76,.3)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-ghost{background:var(--ink3);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:var(--border2)}
+.btn-danger{background:rgba(240,96,96,.07);border:1px solid rgba(240,96,96,.2);color:var(--red)}
+.btn-danger:hover{background:rgba(240,96,96,.14)}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+
+/* ── ALERTS ──── */
+.alert{padding:11px 16px;border-radius:10px;font-size:.84rem;margin-bottom:14px;display:flex;align-items:center;gap:10px;animation:fadeIn .25s ease}
+.alert-ok{background:rgba(45,212,160,.07);border:1px solid rgba(45,212,160,.2);color:var(--green)}
+.alert-err{background:rgba(240,96,96,.07);border:1px solid rgba(240,96,96,.2);color:var(--red)}
+.alert-info{background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.2);color:var(--blue)}
+
+/* ── MISC ──── */
+.mono{font-family:'IBM Plex Mono',monospace;font-size:.76rem;color:var(--muted)}
+.spin{animation:rotate .8s linear infinite;display:inline-block}
+.empty-row td{text-align:center;padding:32px;color:var(--muted)}
+.section-title{font-size:1.05rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.divider{height:1px;background:var(--border);margin:18px 0}
+.tag{display:inline-block;padding:2px 8px;border-radius:100px;font-size:.7rem;font-weight:700}
+.tag-g{background:rgba(45,212,160,.1);color:var(--green)}
+.tag-r{background:rgba(240,96,96,.1);color:var(--red)}
+.tag-b{background:rgba(96,165,250,.1);color:var(--blue)}
+.tag-o{background:rgba(251,146,60,.1);color:var(--orange)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+
+@media(max-width:900px){
+  .sidebar{width:200px}
+  .stats4{grid-template-columns:repeat(2,1fr)}
+  .panels2{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  #admin-shell{flex-direction:column}
+  .sidebar{width:100%;min-height:auto;height:auto;position:static}
+  .main-area{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     ADMIN AUTH
+════════════════════════════════════════════ -->
+<div id="admin-auth">
+  <div class="admin-auth-box">
+    <div class="admin-badge">🔐 دخول محمي للمدير فقط</div>
+    <div class="auth-logo2">
+      <div class="auth-logo2-icon">🛡️</div>
+      <div>
+        <div class="auth-logo2-title">أمان — الإدارة</div>
+        <div class="auth-logo2-sub">للمسؤولين فقط</div>
+      </div>
+    </div>
+    <div id="adm-err" class="auth-err"></div>
+    <label class="f-label">البريد الإلكتروني</label>
+    <input class="f-input" type="email" id="adm-email" value="admin@aman.app" autocomplete="off">
+    <label class="f-label">كلمة المرور</label>
+    <input class="f-input" type="password" id="adm-pass" placeholder="كلمة مرور المدير" autocomplete="off">
+    <button class="btn-admin-login" id="adm-login-btn" onclick="adminLogin()">دخول لوحة الإدارة</button>
+    <p style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:16px;">
+      🔒 الجلسة مشفرة ومؤقتة · تنتهي تلقائياً بعد 7 أيام
+    </p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     ADMIN SHELL
+════════════════════════════════════════════ -->
+<div id="admin-shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sb-icon">🛡️</div>
+      <div>
+        <div class="sb-title">أمان</div>
+        <div class="sb-sub">لوحة الإدارة</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="snav-section">الرئيسية</div>
+      <button class="snav-item active" onclick="gotoPage('overview')"><span class="snav-icon">📊</span> نظرة عامة</button>
+      <div class="snav-section">الإدارة</div>
+      <button class="snav-item" onclick="gotoPage('apikey')"><span class="snav-icon">🔑</span> مفتاح API</button>
+      <button class="snav-item" onclick="gotoPage('users')"><span class="snav-icon">👥</span> المستخدمون</button>
+      <button class="snav-item" onclick="gotoPage('settings')"><span class="snav-icon">⚙️</span> الإعدادات</button>
+      <button class="snav-item" onclick="gotoPage('smtp')"><span class="snav-icon">📧</span> البريد SMTP</button>
+      <button class="snav-item" onclick="gotoPage('worker')"><span class="snav-icon">⚡</span> Worker AI</button>
+      <button class="snav-item" onclick="gotoPage('firebase')"><span class="snav-icon">🔥</span> Firebase</button>
+      <div class="snav-section">أدوات</div>
+      <button class="snav-item" onclick="gotoPage('notifs')"><span class="snav-icon">🔔</span> الإشعارات <span id="notif-badge" style="display:none;background:var(--red);color:white;font-size:.65rem;padding:1px 6px;border-radius:100px;margin-right:4px"></span></button>
+      <button class="snav-item" onclick="gotoPage('plans')"><span class="snav-icon">💎</span> الخطط والدفع</button>
+      <button class="snav-item" onclick="window.open('/pricing','_blank')"><span class="snav-icon">🔗</span> صفحة الأسعار</button>
+      <button class="snav-item" onclick="gotoPage('logs')"><span class="snav-icon">📜</span> سجل النشاط</button>
+      <button class="snav-item" onclick="window.open('/app','_blank')"><span class="snav-icon">🌐</span> فتح التطبيق</button>
+      <button class="snav-item" onclick="window.open('/','_blank')"><span class="snav-icon">🏠</span> الصفحة الرئيسية</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-chip">
+        <div class="admin-av" id="adm-av">م</div>
+        <div>
+          <div class="admin-name" id="adm-name">—</div>
+          <div class="admin-role">مدير النظام</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="adminLogout()">تسجيل الخروج</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <div id="page-alert"></div>
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <div id="page-overview">
+      <div class="topbar">
+        <div>
+          <h1>نظرة عامة</h1>
+          <div class="sub">مرحباً بك في لوحة إدارة أمان</div>
+        </div>
+        <div id="api-status-pill" class="api-status-pill api-miss">
+          <div class="dot dot-r"></div> API غير مضبوط
+        </div>
+      </div>
+
+      <!-- Alert if no API key -->
+      <div id="no-api-banner" class="alert alert-err" style="display:none;">
+        ⚠️ لم يتم ضبط مفتاح Google Gemini API بعد. الترجمة لن تعمل حتى تضيفه.
+        <button onclick="gotoPage('apikey')" style="background:var(--red);color:white;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.8rem;margin-right:auto;">اضبط الآن ←</button>
+      </div>
+
+      <div id="integration-status" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"></div>
+      <div class="stats4" id="stats-grid">
+        <div class="sc gc"><div class="sc-icon">👥</div><div class="sc-num" id="s-users">—</div><div class="sc-lbl">إجمالي المستخدمين</div></div>
+        <div class="sc gg"><div class="sc-icon">🌐</div><div class="sc-num" id="s-trans">—</div><div class="sc-lbl">ترجمة منجزة</div></div>
+        <div class="sc gb"><div class="sc-icon">📝</div><div class="sc-num" id="s-words">—</div><div class="sc-lbl">كلمة مترجمة</div></div>
+        <div class="sc gr"><div class="sc-icon">⚡</div><div class="sc-num" id="s-active">—</div><div class="sc-lbl">مهام نشطة</div></div>
+      </div>
+
+      <div class="panels2">
+        <div class="panel">
+          <div class="panel-h">🔑 حالة مفتاح API</div>
+          <div class="panel-b">
+            <div id="key-status-detail" style="padding:8px 0;"></div>
+            <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="gotoPage('apikey')">إدارة المفتاح</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h">⚙️ إعدادات سريعة</div>
+          <div class="panel-b">
+            <div class="setting-row">
+              <div class="setting-info"><h4>السماح بالتسجيل</h4><p>السماح للمستخدمين الجدد بإنشاء حسابات</p></div>
+              <label class="toggle"><input type="checkbox" id="ov-allow-reg" onchange="quickToggle('allowRegistration',this.checked)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><h4>الخطة المجانية</h4><p>تمكين الخطة المجانية للمستخدمين</p></div>
+              <label class="toggle"><input type="checkbox" id="ov-free-plan" onchange="quickToggle('freePlanEnabled',this.checked)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>👥 آخر المستخدمين</span><button class="btn btn-ghost btn-sm" onclick="gotoPage('users')">عرض الكل</button></div>
+        <div class="panel-b" style="padding:0">
+          <div class="table-wrap"><table id="recent-users-table">
+            <thead><tr><th>المستخدم</th><th>البريد</th><th>الخطة</th><th>الترجمات</th><th>التاريخ</th></tr></thead>
+            <tbody id="recent-users-body"></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ API KEY ═══ -->
+    <div id="page-apikey" style="display:none">
+      <div class="topbar">
+        <div><h1>🔑 مفتاح Google Gemini API</h1><div class="sub">اضبط مفتاح API لتفعيل خدمة الترجمة</div></div>
+      </div>
+
+      <div class="panels2">
+        <div class="panel">
+          <div class="panel-h">ضبط المفتاح</div>
+          <div class="panel-b">
+            <div id="key-save-alert"></div>
+
+            <label class="f-label">Google Gemini API Key</label>
+            <div class="api-key-wrap">
+              <input class="f-input" type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off" oninput="checkKeyStrength(this.value)">
+              <button class="api-vis-btn" onclick="toggleKeyVis()" title="إظهار/إخفاء">👁</button>
+            </div>
+            <div class="key-strength" id="key-strength-bar" style="background:var(--border)"></div>
+            <div class="api-key-hint" id="key-hint">
+              أدخل مفتاح API الخاص بك. يُخزَّن بأمان على الخادم ولا يظهر للمستخدمين أبداً.<br>
+              📎 احصل على مفتاح مجاني: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary" id="save-key-btn" onclick="saveApiKey()">💾 حفظ المفتاح</button>
+              <button class="btn btn-ghost" onclick="testApiKey()">🧪 اختبار</button>
+              <button class="btn btn-danger" onclick="clearApiKey()">🗑️ حذف</button>
+            </div>
+
+            <div class="divider"></div>
+            <div class="section-title" style="font-size:.85rem">🔐 معلومات الأمان</div>
+            <div style="font-size:.8rem;color:var(--muted);line-height:1.9">
+              ✓ المفتاح مشفر ومخزن في ملف على الخادم<br>
+              ✓ لا يُرسل المفتاح للمستخدمين أو المتصفح<br>
+              ✓ يستخدم فقط لطلبات الترجمة من الخادم<br>
+              ✓ يُعرض مقنعاً (••••) حتى للمدير<br>
+              ✓ الجلسات الإدارية مشفرة ومحدودة الوقت
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-h">اختيار النموذج</div>
+          <div class="panel-b">
+
+            <!-- Quota error banner -->
+            <div class="alert alert-err" style="font-size:.82rem;margin-bottom:14px;">
+              <div>
+                <b>⚠️ تجاوز الحصة (Quota Exceeded)?</b><br>
+                إذا ظهرت رسالة <code style="background:rgba(0,0,0,.3);padding:2px 5px;border-radius:4px">quota exceeded</code> —
+                غيّر النموذج أدناه إلى <b>gemini-2.5-flash</b> أو أنشئ مفتاحاً جديداً من مشروع مختلف.
+              </div>
+            </div>
+
+            <label class="f-label">النموذج المستخدم للترجمة</label>
+            <div class="sel-wrap2" style="position:relative;margin-bottom:6px;">
+              <select id="model-select" class="f-input" style="margin-bottom:0;padding-left:10px;-webkit-appearance:none;appearance:none;cursor:pointer;">
+                <optgroup label="=== Gemini 2.5 — مجاني (موصى به) ===">
+                  <option value="gemini-2.5-flash">gemini-2.5-flash ⭐ الأفضل مجاناً — سريع ودقيق</option>
+                  <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite — الأسرع والأرخص تكلفة</option>
+                  <option value="gemini-2.5-pro">gemini-2.5-pro — الأدق (حصة أقل)</option>
+                </optgroup>
+                <optgroup label="=== Gemini 3 — preview (مدفوع) ===">
+                  <option value="gemini-3-flash-preview">gemini-3-flash-preview — أداء متقدم بسرعة عالية</option>
+                  <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview — الأقوى (مدفوع)</option>
+                  <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite — الأرخص من الجيل الثالث</option>
+                </optgroup>
+                <optgroup label="=== Gemini 2.0 — يُوقف 1 يونيو 2026 ===">
+                  <option value="gemini-2.0-flash">gemini-2.0-flash — لا تستخدمه، سيُوقف قريباً</option>
+                </optgroup>
+              </select>
+            </div>
+            <div style="font-size:.76rem;color:var(--muted);margin-bottom:16px;line-height:1.7">
+              💡 <b>gemini-2.5-flash</b> هو الأفضل الآن للمجان — سريع ودقيق.<br>
+              ⚠️ نماذج 1.5 و 2.0 أُوقفت أو ستُوقف قريباً — لا تستخدمها.<br>
+              🔗 <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" style="color:var(--blue)">قائمة النماذج الكاملة من Google</a>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="saveModel()">💾 حفظ النموذج</button>
+            <div id="model-alert" style="margin-top:10px;"></div>
+
+            <div class="divider"></div>
+
+            <div style="font-size:.8rem;color:var(--muted);line-height:2.1">
+              <div>🌡️ درجة الحرارة: <span style="color:var(--text)">0.1</span></div>
+              <div>📊 حد المخرجات: <span style="color:var(--text)">8,192 token</span></div>
+              <div>⏱️ مهلة الطلب: <span style="color:var(--text)">90 ثانية</span></div>
+              <div>📦 حجم القطعة: <span style="color:var(--text)">3,500 حرف</span></div>
+            </div>
+
+            <div class="divider"></div>
+            <div style="font-size:.76rem;color:var(--muted);line-height:1.8">
+              🔗 <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--blue);">أنشئ مفتاحاً جديداً من مشروع مختلف</a><br>
+              🔗 <a href="https://ai.dev/rate-limit" target="_blank" style="color:var(--blue);">تحقق من حصتك الحالية</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test result -->
+      <div id="test-result" style="display:none" class="panel">
+        <div class="panel-h">🧪 نتيجة الاختبار</div>
+        <div class="panel-b" id="test-result-body"></div>
+      </div>
+    </div>
+
+    <!-- ═══ USERS ═══ -->
+    <div id="page-users" style="display:none">
+      <div class="topbar">
+        <div><h1>👥 المستخدمون</h1><div class="sub" id="users-count-sub">—</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="loadUsers()">🔄 تحديث</button>
+          <a href="/api/admin/export-users" id="export-btn" class="btn btn-ghost btn-sm" style="text-decoration:none" onclick="setExportAuth(event)">📥 تصدير CSV</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><span>قائمة المستخدمين</span></div>
+        <div class="panel-b">
+          <div class="table-controls">
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input class="search-input" type="text" id="user-search" placeholder="بحث بالاسم أو البريد..." oninput="filterUsers()">
+            </div>
+            <select class="filter-select" id="plan-filter" onchange="filterUsers()">
+              <option value="">كل الخطط</option>
+              <option value="free">مجاني</option>
+              <option value="pro">احترافي</option>
+            </select>
+            <select class="filter-select" id="role-filter" onchange="filterUsers()">
+              <option value="">كل الأدوار</option>
+              <option value="admin">مدير</option>
+              <option value="user">مستخدم</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>المستخدم</th><th>البريد</th><th>الخطة</th><th>الدور</th><th>الترجمات</th><th>الكلمات</th><th>التسجيل</th><th>إجراءات</th></tr></thead>
+              <tbody id="users-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <div id="page-settings" style="display:none">
+      <div class="topbar">
+        <div><h1>⚙️ إعدادات النظام</h1><div class="sub">تحكم في سلوك التطبيق والخطط</div></div>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 حفظ التغييرات</button>
+      </div>
+
+      <div id="settings-alert"></div>
+
+      <div class="panels2">
+        <div class="panel">
+          <div class="panel-h">🔐 الوصول والتسجيل</div>
+          <div class="panel-b">
+            <div class="setting-row">
+              <div class="setting-info"><h4>السماح بالتسجيل</h4><p>يمكن للزوار إنشاء حسابات جديدة</p></div>
+              <label class="toggle"><input type="checkbox" id="s-allow-reg"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><h4>تفعيل الخطة المجانية</h4><p>المستخدمون الجدد يحصلون على خطة مجانية</p></div>
+              <label class="toggle"><input type="checkbox" id="s-free-plan"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-h">📊 حدود الخطة المجانية</div>
+          <div class="panel-b">
+            <div class="setting-row">
+              <div class="setting-info"><h4>حد الأحرف (نص)</h4><p>أقصى عدد أحرف للترجمة النصية</p></div>
+              <input class="num-input" type="number" id="s-free-chars" min="100" max="10000" step="100">
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><h4>حد الملفات (مهمة)</h4><p>أقصى عدد ملفات لكل مهمة</p></div>
+              <input class="num-input" type="number" id="s-free-files" min="1" max="20" step="1">
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><h4>أقصى عدد ملفات (Pro)</h4><p>للخطة الاحترافية</p></div>
+              <input class="num-input" type="number" id="s-max-files" min="1" max="100" step="1">
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><h4>أقصى حجم ملف (MB)</h4><p>يُطبق على جميع الخطط</p></div>
+              <input class="num-input" type="number" id="s-max-size" min="1" max="100" step="1">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h">⚠️ منطقة الخطر</div>
+        <div class="panel-b">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
+            <div>
+              <div style="font-size:.9rem;font-weight:700">حذف بيانات الجلسات المنتهية</div>
+              <div style="font-size:.78rem;color:var(--muted);margin-top:2px">يحذف جلسات تسجيل الدخول المنتهية من قاعدة البيانات</div>
+            </div>
+            <button class="btn btn-danger" onclick="cleanSessions()">🧹 تنظيف الجلسات</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- PLANS & PAYMENTS PAGE -->
+    <div id="page-plans" style="display:none">
+      <div class="topbar">
+        <div><h1>💎 الخطط وطرق الدفع</h1><div class="sub">تحكم في أسعار الاشتراك وطرق الدفع المتاحة للعملاء</div></div>
+        <a href="/pricing" target="_blank" class="btn btn-ghost btn-sm">🔗 عرض الصفحة</a>
+      </div>
+      <div id="plans-alert"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px">
+
+        <!-- PLANS EDITOR -->
+        <div class="panel">
+          <div class="panel-h"><span>💎 الخطط</span><button class="btn btn-primary btn-sm" onclick="addPlan()">+ إضافة خطة</button></div>
+          <div class="panel-b" id="plans-editor">
+            <div style="text-align:center;color:var(--muted);padding:20px">جاري التحميل...</div>
+          </div>
+        </div>
+
+        <!-- PAYMENT METHODS EDITOR -->
+        <div class="panel">
+          <div class="panel-h"><span>💳 طرق الدفع</span><button class="btn btn-primary btn-sm" onclick="addPaymentMethod()">+ إضافة طريقة</button></div>
+          <div class="panel-b" id="payments-editor">
+            <div style="text-align:center;color:var(--muted);padding:20px">جاري التحميل...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- NOTIFICATIONS PAGE -->
+    <div id="page-notifs" style="display:none">
+      <div class="topbar">
+        <div><h1>🔔 الإشعارات</h1><div class="sub" id="notifs-sub">طلبات الدفع والاشتراكات</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadNotifs()">🔄 تحديث</button>
+      </div>
+      <div id="notifs-alert"></div>
+      <div class="panel">
+        <div class="panel-h"><span>طلبات الدفع</span></div>
+        <div class="panel-b" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>الوقت</th><th>المستخدم</th><th>الخطة</th><th>المبلغ</th><th>الطريقة</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+              <tbody id="notifs-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- LOGS PAGE -->
+    <div id="page-logs" style="display:none">
+      <div class="topbar">
+        <div><h1>📜 سجل النشاط</h1><div class="sub">آخر 200 نشاط في النظام</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadLogs()">🔄 تحديث</button>
+      </div>
+      <div class="panel">
+        <div class="panel-b" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>الوقت</th><th>الإجراء</th><th>المستخدم</th><th>التفاصيل</th></tr></thead>
+              <tbody id="logs-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SMTP PAGE ═══ -->
+    <div id="page-smtp" style="display:none">
+      <div class="topbar">
+        <div><h1>📧 إعدادات البريد SMTP</h1><div class="sub">إرسال إيميلات تلقائية عند التسجيل والدفع</div></div>
+        <button class="btn btn-primary" onclick="saveSmtp()">💾 حفظ</button>
+      </div>
+      <div id="smtp-alert"></div>
+      <div class="panels2">
+        <div class="panel">
+          <div class="panel-h">⚙️ إعدادات الخادم</div>
+          <div class="panel-b">
+            <label class="f-label">SMTP Host</label>
+            <input class="f-input" id="smtp-host" placeholder="smtp.gmail.com">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div>
+                <label class="f-label">Port</label>
+                <input class="f-input" id="smtp-port" type="number" value="587" placeholder="587">
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:22px">
+                <label class="toggle"><input type="checkbox" id="smtp-secure"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                <span style="font-size:.82rem">TLS/SSL مباشر (465)</span>
+              </div>
+            </div>
+            <label class="f-label">اسم المستخدم (البريد)</label>
+            <input class="f-input" id="smtp-user" type="email" placeholder="your@gmail.com">
+            <label class="f-label">كلمة المرور / App Password</label>
+            <input class="f-input" id="smtp-pass" type="password" placeholder="••••••••">
+            <label class="f-label">عنوان المرسل (From)</label>
+            <input class="f-input" id="smtp-from" placeholder="noreply@yourapp.com">
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h">📬 الإيميلات التلقائية</div>
+          <div class="panel-b">
+            <div class="setting-row"><div class="setting-info"><h4>ترحيب عند التسجيل</h4><p>يُرسل للمستخدم الجديد</p></div><label class="toggle"><input type="checkbox" id="smtp-on-reg"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+            <div class="setting-row"><div class="setting-info"><h4>تأكيد استلام الدفعة</h4><p>يُرسل للعميل بعد إرسال طلب الدفع</p></div><label class="toggle"><input type="checkbox" id="smtp-on-payment"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+            <div class="setting-row"><div class="setting-info"><h4>تفعيل الاشتراك</h4><p>يُرسل للعميل بعد موافقة الأدمن</p></div><label class="toggle"><input type="checkbox" id="smtp-on-approved"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+            <div class="divider"></div>
+            <div class="section-title" style="font-size:.84rem">🧪 اختبار الاتصال</div>
+            <div style="display:flex;gap:8px">
+              <input class="f-input" id="smtp-test-to" placeholder="test@example.com" style="margin-bottom:0;flex:1">
+              <button class="btn btn-ghost btn-sm" onclick="testSmtp()">📤 أرسل</button>
+            </div>
+            <div id="smtp-test-result" style="margin-top:8px;font-size:.8rem"></div>
+            <div class="divider"></div>
+            <div style="font-size:.78rem;color:var(--muted);line-height:1.9">
+              <b style="color:var(--gold2)">Gmail:</b> Host: smtp.gmail.com · Port: 587<br>
+              استخدم <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--blue)">App Password</a> بدل كلمة مرور حسابك.<br>
+              <b style="color:var(--gold2)">Outlook:</b> smtp-mail.outlook.com · Port: 587<br>
+              <b style="color:var(--gold2)">Custom:</b> أي SMTP يدعم STARTTLS أو SSL.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ WORKER PAGE ═══ -->
+    <div id="page-worker" style="display:none">
+      <div class="topbar">
+        <div><h1>⚡ Deno Worker — وسيط AI</h1><div class="sub">يتجاوز الحظر الجغرافي على Gemini في بعض الدول</div></div>
+        <button class="btn btn-primary" onclick="saveWorker()">💾 حفظ</button>
+      </div>
+      <div id="worker-alert"></div>
+      <div class="panels2">
+        <div class="panel">
+          <div class="panel-h">🔗 إعداد Worker</div>
+          <div class="panel-b">
+            <div class="setting-row" style="margin-bottom:14px">
+              <div class="setting-info"><h4>تفعيل Worker</h4><p>استخدم Worker بدلاً من الاتصال المباشر</p></div>
+              <label class="toggle"><input type="checkbox" id="wk-enabled"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <label class="f-label">Worker URL</label>
+            <input class="f-input" id="wk-url" placeholder="https://xxx.deno.dev">
+            <label class="f-label">Worker Secret (نفس قيمة AMAN_SECRET في Deno)</label>
+            <input class="f-input" id="wk-secret" type="password" placeholder="••••••••">
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <button class="btn btn-ghost btn-sm" onclick="testWorker()">🧪 اختبار الاتصال</button>
+            </div>
+            <div id="worker-test-result" style="margin-top:8px;font-size:.8rem"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h">📖 طريقة النشر على Deno Deploy</div>
+          <div class="panel-b">
+            <div style="font-size:.82rem;line-height:2;color:var(--muted)">
+              <div style="color:var(--text);font-weight:700;margin-bottom:8px">الخطوات (مجاني 100%)</div>
+              <div><span style="color:var(--gold2);font-weight:700">1.</span> اذهب إلى <a href="https://dash.deno.com" target="_blank" style="color:var(--blue)">dash.deno.com</a></div>
+              <div><span style="color:var(--gold2);font-weight:700">2.</span> New Project → Deploy URL أو GitHub</div>
+              <div><span style="color:var(--gold2);font-weight:700">3.</span> ضع ملف <code style="color:var(--green);background:var(--ink3);padding:1px 5px;border-radius:4px">worker/worker.ts</code></div>
+              <div><span style="color:var(--gold2);font-weight:700">4.</span> أضف Environment Variable: <code style="color:var(--green);background:var(--ink3);padding:1px 5px;border-radius:4px">AMAN_SECRET</code></div>
+              <div><span style="color:var(--gold2);font-weight:700">5.</span> انسخ الرابط وضعه هنا ↑</div>
+              <div class="divider" style="margin:12px 0"></div>
+              <div style="color:var(--text);font-weight:700;margin-bottom:6px">ملف Worker جاهز في المشروع:</div>
+              <code style="color:var(--gold2);font-size:.78rem;background:var(--ink3);padding:6px 10px;border-radius:8px;display:block">worker/worker.ts</code>
+              <div class="divider" style="margin:12px 0"></div>
+              <div style="color:var(--blue)">Deno Deploy: 100,000 طلب/يوم مجاناً</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FIREBASE PAGE ═══ -->
+    <div id="page-firebase" style="display:none">
+      <div class="topbar">
+        <div><h1>🔥 Firebase Firestore</h1><div class="sub">استبدل data.json بقاعدة بيانات سحابية</div></div>
+        <button class="btn btn-primary" onclick="saveFirebase()">💾 حفظ</button>
+      </div>
+      <div id="firebase-alert"></div>
+      <div class="panels2">
+        <div class="panel">
+          <div class="panel-h">🔧 الإعداد</div>
+          <div class="panel-b">
+            <div class="setting-row" style="margin-bottom:14px">
+              <div class="setting-info"><h4>تفعيل Firebase</h4><p>استخدم Firestore بدل data.json المحلي</p></div>
+              <label class="toggle"><input type="checkbox" id="fb-enabled"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+            <label class="f-label">Firebase Project ID</label>
+            <input class="f-input" id="fb-project" placeholder="my-aman-app">
+            <label class="f-label">Service Account Key (JSON كامل)</label>
+            <textarea class="f-input" id="fb-key" rows="6" placeholder='{"type":"service_account","project_id":"...","private_key":"-----BEGIN RSA..."}'
+              style="height:auto;font-size:.72rem;font-family:monospace;resize:vertical"></textarea>
+            <div style="font-size:.75rem;color:var(--muted);margin-bottom:12px">
+              🔒 يُخزَّن مشفراً، لا يُعرض مجدداً. إذا كان مضبوطاً ستظهر "••• (set) •••"
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm" onclick="testFirebase()">🧪 اختبار الاتصال</button>
+              <button class="btn btn-ghost btn-sm" onclick="syncFirebase()">🔄 مزامنة الآن</button>
+            </div>
+            <div id="firebase-test-result" style="margin-top:8px;font-size:.8rem"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h">📖 طريقة الإعداد</div>
+          <div class="panel-b">
+            <div style="font-size:.82rem;line-height:2;color:var(--muted)">
+              <div style="color:var(--text);font-weight:700;margin-bottom:8px">الخطوات:</div>
+              <div><span style="color:var(--gold2);font-weight:700">1.</span> اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:var(--blue)">console.firebase.google.com</a></div>
+              <div><span style="color:var(--gold2);font-weight:700">2.</span> أنشئ مشروعاً → Firestore Database</div>
+              <div><span style="color:var(--gold2);font-weight:700">3.</span> Project Settings → Service Accounts</div>
+              <div><span style="color:var(--gold2);font-weight:700">4.</span> Generate New Private Key → حمّل JSON</div>
+              <div><span style="color:var(--gold2);font-weight:700">5.</span> الصق محتوى الـ JSON في الحقل أعلاه</div>
+              <div><span style="color:var(--gold2);font-weight:700">6.</span> اضغط اختبار ← مزامنة ← حفظ</div>
+              <div class="divider" style="margin:12px 0"></div>
+              <div style="color:var(--text);font-weight:700;margin-bottom:6px">Collections في Firestore:</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:.76rem">
+                <code style="background:var(--ink3);padding:3px 7px;border-radius:5px">users/</code>
+                <code style="background:var(--ink3);padding:3px 7px;border-radius:5px">sessions/</code>
+                <code style="background:var(--ink3);padding:3px 7px;border-radius:5px">notifications/</code>
+                <code style="background:var(--ink3);padding:3px 7px;border-radius:5px">meta/settings</code>
+              </div>
+              <div class="divider" style="margin:12px 0"></div>
+              <div style="color:var(--blue)">Firebase Spark (مجاني): 1GB storage، 50K reads/day</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /main-area -->
+</div><!-- /admin-shell -->
+
+<script>
+const API = '';
+let adminToken = null;
+let adminUser = null;
+let allUsers = [];
+let currentSettings = {};
+
+const headers = () => ({ 'Content-Type':'application/json', 'Authorization':'Bearer ' + adminToken });
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+async function checkAdminAuth() {
+  const t = localStorage.getItem('aman_admin_token') || localStorage.getItem('aman_token');
+  if (!t) return;
+  try {
+    const r = await fetch(`${API}/api/auth/me`, { headers: { 'Authorization':'Bearer ' + t } });
+    if (!r.ok) return;
+    const u = await r.json();
+    if (u.role !== 'admin') return;
+    adminToken = t; adminUser = u;
+    showShell();
+  } catch {}
+}
+
+document.getElementById('adm-pass').addEventListener('keydown', e => e.key === 'Enter' && adminLogin());
+
+async function adminLogin() {
+  const btn = document.getElementById('adm-login-btn');
+  btn.disabled = true; btn.textContent = '...';
+  const email = document.getElementById('adm-email').value.trim();
+  const password = document.getElementById('adm-pass').value;
+  try {
+    const r = await fetch(`${API}/api/auth/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ email, password })
+    });
+    const d = await r.json();
+    if (!r.ok) { showAdmErr(d.error); btn.disabled=false; btn.textContent='دخول لوحة الإدارة'; return; }
+    if (d.user?.role !== 'admin') { showAdmErr('هذا الحساب ليس لديه صلاحيات الإدارة'); btn.disabled=false; btn.textContent='دخول لوحة الإدارة'; return; }
+    adminToken = d.token; adminUser = d.user;
+    localStorage.setItem('aman_admin_token', d.token);
+    showShell();
+  } catch (e) { showAdmErr('خطأ في الاتصال: ' + e.message); btn.disabled=false; btn.textContent='دخول لوحة الإدارة'; }
+}
+
+function showAdmErr(msg) {
+  const el = document.getElementById('adm-err');
+  el.textContent = msg; el.classList.add('show');
+}
+
+function showShell() {
+  document.getElementById('admin-auth').style.display = 'none';
+  document.getElementById('admin-shell').style.display = 'flex';
+  document.getElementById('adm-name').textContent = adminUser?.name || 'مدير';
+  document.getElementById('adm-av').textContent = (adminUser?.name || 'م')[0];
+  loadOverview();
+  setTimeout(updateBadge, 500);
+}
+
+function adminLogout() {
+  localStorage.removeItem('aman_admin_token');
+  adminToken = null; adminUser = null;
+  location.reload();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+const pages = ['overview','apikey','users','settings','plans','notifs','logs','smtp','worker','firebase'];
+
+function gotoPage(id) {
+  pages.forEach(p => {
+    document.getElementById('page-'+p).style.display = p === id ? '' : 'none';
+    document.querySelectorAll('.snav-item').forEach(el => {
+      const txt = el.textContent.trim();
+      const map = { overview:'نظرة', apikey:'مفتاح', users:'المستخدم', settings:'الإعدادات' };
+      if (txt.includes(map[id])) el.classList.toggle('active', p === id);
+      else if (p !== id) el.classList.remove('active');
+    });
+  });
+  if (id === 'overview') loadOverview();
+  if (id === 'users') loadUsers();
+  if (id === 'settings') loadSettings();
+  if (id === 'apikey') loadApiKeyPage();
+  if (id === 'plans') loadPlansPage();
+  if (id === 'notifs') loadNotifs();
+  if (id === 'logs')     loadLogs();
+  if (id === 'smtp')     loadSmtp();
+  if (id === 'worker')   loadWorker();
+  if (id === 'firebase') loadFirebase();
+  document.getElementById('page-alert').innerHTML = '';
+}
+
+// Fix nav active state
+function setNavActive(id) {
+  document.querySelectorAll('.snav-item').forEach(el => el.classList.remove('active'));
+  const labels = {overview:'نظرة عامة', apikey:'مفتاح API', users:'المستخدمون', settings:'الإعدادات', plans:'الخطط', notifs:'الإشعارات', logs:'سجل النشاط', smtp:'البريد SMTP', worker:'Worker AI', firebase:'Firebase'};
+  document.querySelectorAll('.snav-item').forEach(el => {
+    if (el.textContent.includes(labels[id])) el.classList.add('active');
+  });
+}
+
+async function loadOverview() {
+  setNavActive('overview');
+  try {
+    const r = await fetch(`${API}/api/admin/stats`, { headers: headers() });
+    const d = await r.json();
+    const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+'K' : (n||0).toString();
+    document.getElementById('s-users').textContent = fmt(d.totalUsers);
+    document.getElementById('s-trans').textContent = fmt(d.totalTranslations);
+    document.getElementById('s-words').textContent = fmt(d.totalWords);
+    document.getElementById('s-active').textContent = d.activeJobs || 0;
+    // Show integration status
+    const smtpBadge   = d.smtpReady     ? '<span class="tag tag-g">✓ SMTP</span>' : '<span class="tag tag-r">✗ SMTP</span>';
+    const workerBadge = d.workerActive  ? '<span class="tag tag-g">✓ Worker</span>' : '<span class="tag" style="background:rgba(107,96,80,.15);color:var(--muted)">⬜ Worker</span>';
+    const fbBadge     = d.firebaseActive? '<span class="tag tag-g">✓ Firebase</span>' : '<span class="tag" style="background:rgba(107,96,80,.15);color:var(--muted)">⬜ JSON Local</span>';
+    const intRow = document.getElementById('integration-status');
+    if (intRow) intRow.innerHTML = smtpBadge + ' ' + workerBadge + ' ' + fbBadge;
+    // Show pending payments count in overview
+    if (d.pendingPayments > 0) {
+      const badge = document.getElementById('notif-badge');
+      if (badge) { badge.textContent = d.pendingPayments; badge.style.display = ''; }
+    }
+
+    const pill = document.getElementById('api-status-pill');
+    const banner = document.getElementById('no-api-banner');
+    const detail = document.getElementById('key-status-detail');
+    if (d.apiKeySet) {
+      pill.className = 'api-status-pill api-ok';
+      pill.innerHTML = '<div class="dot dot-g"></div> API مضبوط ✓';
+      banner.style.display = 'none';
+      detail.innerHTML = '<div class="tag tag-g">✓ المفتاح مضبوط</div><p style="font-size:.8rem;color:var(--muted);margin-top:8px;">الترجمة تعمل بشكل طبيعي.</p>';
+    } else {
+      pill.className = 'api-status-pill api-miss';
+      pill.innerHTML = '<div class="dot dot-r"></div> API غير مضبوط';
+      banner.style.display = 'flex';
+      detail.innerHTML = '<div class="tag tag-r">✗ مفتاح API غير موجود</div><p style="font-size:.8rem;color:var(--muted);margin-top:8px;">يجب ضبط مفتاح Gemini لتعمل الترجمة.</p>';
+    }
+
+    // Load recent users
+    const ur = await fetch(`${API}/api/admin/users`, { headers: headers() });
+    const ud = await ur.json();
+    allUsers = ud.users || [];
+    const tbody = document.getElementById('recent-users-body');
+    const recent = allUsers.sort((a,b) => b.createdAt - a.createdAt).slice(0,5);
+    if (!recent.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="5">لا يوجد مستخدمون بعد</td></tr>'; }
+    else {
+      tbody.innerHTML = recent.map(u => `
+        <tr>
+          <td><div class="user-cell"><div class="user-av-sm">${(u.name||'؟')[0]}</div>${u.name}</div></td>
+          <td class="mono">${u.email}</td>
+          <td><span class="plan-badge plan-${u.plan}">${u.plan==='pro'?'⭐ Pro':'مجاني'}</span></td>
+          <td>${(u.translations||0).toLocaleString()}</td>
+          <td class="mono">${new Date(u.createdAt).toLocaleDateString('ar-SA')}</td>
+        </tr>`).join('');
+    }
+
+    // Load settings for toggles
+    const sr = await fetch(`${API}/api/admin/settings`, { headers: headers() });
+    const sd = await sr.json();
+    currentSettings = sd;
+    document.getElementById('ov-allow-reg').checked = sd.allowRegistration !== false;
+    document.getElementById('ov-free-plan').checked = sd.freePlanEnabled !== false;
+
+  } catch (e) { showPageAlert('خطأ في تحميل البيانات: ' + e.message, 'err'); }
+}
+
+// ── API KEY ───────────────────────────────────────────────────────────────────
+async function loadApiKeyPage() {
+  setNavActive('apikey');
+  document.getElementById('key-save-alert').innerHTML = '';
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, { headers: headers() });
+    const d = await r.json();
+    currentSettings = d;
+    const inp = document.getElementById('api-key-input');
+    inp.value = d.geminiApiKey || '';
+    inp.placeholder = d.geminiApiKey ? 'Set (masked) — enter new key to replace' : 'AIzaSy...';
+    checkKeyStrength(inp.value);
+    // Load model
+    const sel = document.getElementById('model-select');
+    if (sel && d.geminiModel) sel.value = d.geminiModel;
+  } catch (e) { showKeyAlert('Error: ' + e.message, 'err'); }
+}
+
+async function saveModel() {
+  const model = document.getElementById('model-select').value;
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, {
+      method: 'PUT', headers: headers(),
+      body: JSON.stringify({ geminiModel: model })
+    });
+    const d = await r.json();
+    const el = document.getElementById('model-alert');
+    if (r.ok) {
+      el.innerHTML = '<div class="alert alert-ok">Model saved: ' + model + '</div>';
+      setTimeout(() => el.innerHTML = '', 3000);
+    } else {
+      el.innerHTML = '<div class="alert alert-err">' + d.error + '</div>';
+    }
+  } catch(e) { document.getElementById('model-alert').innerHTML = '<div class="alert alert-err">' + e.message + '</div>'; }
+}
+
+function checkKeyStrength(val) {
+  const bar = document.getElementById('key-strength-bar');
+  const hint = document.getElementById('key-hint');
+  if (!val) { bar.style.background = 'var(--border)'; bar.style.width = '100%'; return; }
+  if (val.startsWith('••')) { bar.style.background = 'var(--green)'; bar.style.width = '100%'; hint.textContent = '✓ مفتاح محفوظ (مقنع للأمان).'; return; }
+  if (val.startsWith('AIzaSy') && val.length >= 39) {
+    bar.style.background = 'var(--green)'; bar.style.width = '100%';
+    hint.innerHTML = '✅ المفتاح يبدو صحيح الشكل. اضغط "اختبار" للتحقق.';
+  } else if (val.length > 10) {
+    bar.style.background = 'var(--orange)'; bar.style.width = '50%';
+    hint.innerHTML = '⚠️ المفتاح لا يبدو بالشكل الصحيح. مفاتيح Gemini تبدأ بـ AIzaSy';
+  } else {
+    bar.style.background = 'var(--red)'; bar.style.width = '25%';
+    hint.innerHTML = 'مفتاح API قصير جداً.';
+  }
+}
+
+function toggleKeyVis() {
+  const inp = document.getElementById('api-key-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function saveApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if (!val) return showKeyAlert('أدخل المفتاح أولاً', 'err');
+  if (val.startsWith('••')) return showKeyAlert('لم يتغير المفتاح', 'info');
+
+  const btn = document.getElementById('save-key-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin">↻</span> جاري الحفظ...';
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, {
+      method:'PUT', headers: headers(),
+      body: JSON.stringify({ geminiApiKey: val })
+    });
+    const d = await r.json();
+    if (!r.ok) { showKeyAlert(d.error, 'err'); } 
+    else { showKeyAlert('✅ تم حفظ المفتاح بنجاح!', 'ok'); await loadApiKeyPage(); }
+  } catch (e) { showKeyAlert('خطأ: ' + e.message, 'err'); }
+  btn.disabled = false; btn.innerHTML = '💾 حفظ المفتاح';
+}
+
+async function clearApiKey() {
+  if (!confirm('هل تريد حذف مفتاح API؟ ستتوقف الترجمة.')) return;
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, {
+      method:'PUT', headers: headers(),
+      body: JSON.stringify({ geminiApiKey: '' })
+    });
+    if (r.ok) { showKeyAlert('تم حذف المفتاح.', 'info'); await loadApiKeyPage(); }
+  } catch (e) { showKeyAlert('خطأ: ' + e.message, 'err'); }
+}
+
+async function testApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  const key = (val && !val.startsWith('••')) ? val : currentSettings.geminiApiKey;
+  if (!key || key.startsWith('••')) {
+    const r2 = await fetch(`${API}/api/admin/settings`, { headers: headers() });
+    const d2 = await r2.json();
+    if (!d2.geminiApiKey || d2.geminiApiKey.startsWith('••')) {
+      document.getElementById('test-result').style.display = '';
+      document.getElementById('test-result-body').innerHTML = '<div class="alert alert-err">لا يوجد مفتاح محفوظ. أدخل المفتاح أولاً.</div>';
+      return;
+    }
+  }
+
+  document.getElementById('test-result').style.display = '';
+  document.getElementById('test-result-body').innerHTML = '<span class="spin">↻</span> جاري الاختبار...';
+
+  try {
+    const r = await fetch(`${API}/api/translate/text`, {
+      method:'POST', headers: headers(),
+      body: JSON.stringify({ text: 'Hello, world!', src: 'en', tgt: 'ar', options: {} })
+    });
+    const d = await r.json();
+    if (r.ok) {
+      document.getElementById('test-result-body').innerHTML = `
+        <div class="alert alert-ok">✅ المفتاح يعمل بشكل مثالي!</div>
+        <div style="background:var(--ink3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.85rem">
+          <div style="color:var(--muted);font-size:.75rem;margin-bottom:4px">نص الاختبار</div>
+          <div>Hello, world! → <b style="color:var(--green)">${d.translated}</b></div>
+        </div>`;
+    } else {
+      document.getElementById('test-result-body').innerHTML = `<div class="alert alert-err">❌ فشل الاختبار: ${d.error}</div>`;
+    }
+  } catch (e) {
+    document.getElementById('test-result-body').innerHTML = `<div class="alert alert-err">خطأ: ${e.message}</div>`;
+  }
+}
+
+// ── USERS ─────────────────────────────────────────────────────────────────────
+async function loadUsers() {
+  setNavActive('users');
+  try {
+    const r = await fetch(`${API}/api/admin/users`, { headers: headers() });
+    const d = await r.json();
+    allUsers = d.users || [];
+    document.getElementById('users-count-sub').textContent = `${allUsers.length} مستخدم مسجل`;
+    renderUsers(allUsers);
+  } catch (e) { showPageAlert('خطأ: ' + e.message, 'err'); }
+}
+
+function filterUsers() {
+  const q = document.getElementById('user-search').value.toLowerCase();
+  const plan = document.getElementById('plan-filter').value;
+  const role = document.getElementById('role-filter').value;
+  let filtered = allUsers.filter(u => {
+    if (q && !u.name.toLowerCase().includes(q) && !u.email.toLowerCase().includes(q)) return false;
+    if (plan && u.plan !== plan) return false;
+    if (role && u.role !== role) return false;
+    return true;
+  });
+  renderUsers(filtered);
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById('users-body');
+  if (!users.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">لا يوجد مستخدمون</td></tr>'; return;
+  }
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td><div class="user-cell"><div class="user-av-sm">${(u.name||'؟')[0]}</div><span>${u.name}</span></div></td>
+      <td class="mono">${u.email}</td>
+      <td><span class="plan-badge plan-${u.plan}">${u.plan==='pro'?'⭐ Pro':'مجاني'}</span></td>
+      <td><span class="role-badge role-${u.role}">${u.role==='admin'?'🔐 مدير':'مستخدم'}</span></td>
+      <td class="mono">${(u.translations||0).toLocaleString()}</td>
+      <td class="mono">${(u.words||0).toLocaleString()}</td>
+      <td class="mono" style="font-size:.72rem">${new Date(u.createdAt).toLocaleDateString('ar-SA')}</td>
+      <td>
+        <div class="tbl-actions">
+          ${u.plan !== 'pro'
+            ? `<button class="tbl-btn tbl-btn-upgrade" onclick="upgradeUser('${u.id}')">⬆️ Pro</button>`
+            : `<button class="tbl-btn tbl-btn-upgrade" onclick="downgradeUser('${u.id}')" style="color:var(--muted)">⬇️ مجاني</button>`
+          }
+          ${u.role !== 'admin' ? `<button class="tbl-btn tbl-btn-del" onclick="deleteUser('${u.id}','${u.name}')">حذف</button>` : ''}
+          <button class="tbl-btn" style="background:rgba(96,165,250,.07);color:var(--blue);border:1px solid rgba(96,165,250,.2)" onclick="changeUserPassword('${u.id}','${u.name}')">🔑</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function setExportAuth(e) {
+  // Add auth header via fetch-blob workaround
+  e.preventDefault();
+  fetch('/api/admin/export-users', { headers: headers() })
+    .then(r => r.blob())
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'users_' + new Date().toISOString().slice(0,10) + '.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    });
+}
+
+async function changeUserPassword(id, name) {
+  const newPass = prompt('كلمة مرور جديدة لـ ' + name + ':\n(8 أحرف على الأقل)');
+  if (!newPass) return;
+  if (newPass.length < 8) { showPageAlert('كلمة المرور قصيرة جداً', 'err'); return; }
+  const r = await fetch(`${API}/api/admin/users/${id}`, {
+    method: 'PUT', headers: headers(),
+    body: JSON.stringify({ newPassword: newPass })
+  });
+  const d = await r.json();
+  if (r.ok) showPageAlert('✅ تم تغيير كلمة مرور ' + name, 'ok');
+  else showPageAlert(d.error, 'err');
+}
+
+async function upgradeUser(id) {
+  await fetch(`${API}/api/admin/users/${id}`, {
+    method:'PUT', headers: headers(), body: JSON.stringify({ plan:'pro' })
+  });
+  await loadUsers();
+  showPageAlert('تم الترقية إلى Pro ✓', 'ok');
+}
+
+async function downgradeUser(id) {
+  await fetch(`${API}/api/admin/users/${id}`, {
+    method:'PUT', headers: headers(), body: JSON.stringify({ plan:'free' })
+  });
+  await loadUsers();
+  showPageAlert('تم التخفيض إلى مجاني', 'info');
+}
+
+async function deleteUser(id, name) {
+  if (!confirm(`هل تريد حذف المستخدم "${name}" نهائياً؟`)) return;
+  const r = await fetch(`${API}/api/admin/users/${id}`, { method:'DELETE', headers: headers() });
+  const d = await r.json();
+  if (r.ok) { showPageAlert('تم حذف المستخدم ✓', 'ok'); await loadUsers(); }
+  else showPageAlert(d.error, 'err');
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+async function loadSettings() {
+  setNavActive('settings');
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, { headers: headers() });
+    const d = await r.json();
+    currentSettings = d;
+    document.getElementById('s-allow-reg').checked = d.allowRegistration !== false;
+    document.getElementById('s-free-plan').checked = d.freePlanEnabled !== false;
+    document.getElementById('s-free-chars').value = d.freeCharsLimit || 500;
+    document.getElementById('s-free-files').value = d.freeFilesLimit || 3;
+    document.getElementById('s-max-files').value = d.maxFilesPerJob || 20;
+    document.getElementById('s-max-size').value = d.maxFileSizeMB || 50;
+  } catch (e) { showSettingsAlert('خطأ في تحميل الإعدادات', 'err'); }
+}
+
+async function saveSettings() {
+  const body = {
+    allowRegistration: document.getElementById('s-allow-reg').checked,
+    freePlanEnabled: document.getElementById('s-free-plan').checked,
+    freeCharsLimit: parseInt(document.getElementById('s-free-chars').value),
+    freeFilesLimit: parseInt(document.getElementById('s-free-files').value),
+    maxFilesPerJob: parseInt(document.getElementById('s-max-files').value),
+    maxFileSizeMB: parseInt(document.getElementById('s-max-size').value),
+  };
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, {
+      method:'PUT', headers: headers(), body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (r.ok) showSettingsAlert('✅ تم حفظ الإعدادات بنجاح!', 'ok');
+    else showSettingsAlert(d.error, 'err');
+  } catch (e) { showSettingsAlert('خطأ: ' + e.message, 'err'); }
+}
+
+async function quickToggle(key, val) {
+  try {
+    await fetch(`${API}/api/admin/settings`, {
+      method:'PUT', headers: headers(), body: JSON.stringify({ [key]: val })
+    });
+  } catch {}
+}
+
+function cleanSessions() {
+  showSettingsAlert('تم تنظيف الجلسات المنتهية (تلقائي عند إعادة التشغيل)', 'info');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function showPageAlert(msg, type) {
+  const el = document.getElementById('page-alert');
+  el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(() => el.innerHTML = '', 4000);
+}
+function showKeyAlert(msg, type) {
+  document.getElementById('key-save-alert').innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+}
+function showSettingsAlert(msg, type) {
+  const el = document.getElementById('settings-alert');
+  el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(() => el.innerHTML = '', 4000);
+}
+
+// ── PLANS & PAYMENTS ──────────────────────────────────────────────────────────
+
+let currentPlans = [];
+let currentPayments = [];
+
+async function loadPlansPage() {
+  setNavActive('plans');
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, { headers: headers() });
+    const d = await r.json();
+    currentPlans = d.plans || [];
+    currentPayments = d.paymentMethods || [];
+    renderPlansEditor();
+    renderPaymentsEditor();
+  } catch(e) { showPlansAlert('خطأ: ' + e.message, 'err'); }
+}
+
+// ── PLANS EDITOR ─────────────────────────────────────────────────────────────
+
+const CURRENCIES = ['USD','EUR','SAR','AED','KWD','EGP','TRY'];
+const PLAN_COLORS = ['#6b7280','#c9a84c','#60a5fa','#2dd4a0','#a78bfa','#f06060'];
+
+function renderPlansEditor() {
+  const el = document.getElementById('plans-editor');
+  if (!currentPlans.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:30px;text-align:center;color:var(--muted)">لا توجد خطط — اضغط + إضافة خطة</div>';
+    return;
+  }
+  el.innerHTML = currentPlans.map((p, i) => `
+    <div style="background:var(--ink3);border:1px solid ${p.color || 'var(--border)'};border-radius:12px;padding:16px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:12px;height:12px;border-radius:50%;background:${p.color};flex-shrink:0"></div>
+          <b style="font-size:.92rem">${p.name}</b>
+          ${p.highlighted ? '<span class="tag tag-o">الأبرز</span>' : ''}
+          <span class="tag tag-b">${p.price === 0 ? 'مجاني' : p.price + ' ' + p.currency + '/شهر'}</span>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="tbl-btn tbl-btn-upgrade" onclick="editPlan(${i})">✏️ تعديل</button>
+          <button class="tbl-btn tbl-btn-del" onclick="deletePlan(${i})">حذف</button>
+        </div>
+      </div>
+      <div style="font-size:.76rem;color:var(--muted)">${(p.features||[]).slice(0,3).join(' · ')}</div>
+    </div>
+  `).join('');
+}
+
+function addPlan() {
+  const p = { id: 'plan_' + Date.now(), name: 'خطة جديدة', nameEn: 'New Plan', price: 0, currency: 'USD', period: 'month', color: '#60a5fa', features: [], charsLimit: 0, filesLimit: 10, highlighted: false, description: '' };
+  currentPlans.push(p);
+  openPlanModal(currentPlans.length - 1);
+}
+
+function editPlan(i) { openPlanModal(i); }
+
+function deletePlan(i) {
+  if (!confirm('حذف الخطة "' + currentPlans[i].name + '"؟')) return;
+  currentPlans.splice(i, 1);
+  savePlansAndPayments();
+}
+
+function openPlanModal(i) {
+  const p = currentPlans[i];
+  const html = `
+    <div class="modal-overlay open" id="plan-modal" onclick="if(event.target===this)closePlanModal()">
+    <div class="modal" style="max-width:560px">
+      <div class="modal-header">
+        <div class="modal-title">✏️ ${i === currentPlans.length-1 && p.id.startsWith('plan_') ? 'إضافة' : 'تعديل'} خطة</div>
+        <button class="modal-close" onclick="closePlanModal()">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:70vh;overflow-y:auto">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div>
+            <label class="f-label">اسم الخطة (عربي)</label>
+            <input class="f-input" id="pe-name" value="${p.name}" placeholder="احترافي">
+          </div>
+          <div>
+            <label class="f-label">الاسم (إنجليزي)</label>
+            <input class="f-input" id="pe-name-en" value="${p.nameEn||''}" placeholder="Pro">
+          </div>
+        </div>
+
+        <div>
+          <label class="f-label">الوصف</label>
+          <input class="f-input" id="pe-desc" value="${p.description||''}" placeholder="وصف مختصر للخطة">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+          <div>
+            <label class="f-label">السعر (0 = مجاني)</label>
+            <input class="f-input" id="pe-price" type="number" min="0" step="0.01" value="${p.price}">
+          </div>
+          <div>
+            <label class="f-label">العملة</label>
+            <select class="f-input" id="pe-currency" style="padding:10px 12px">
+              ${CURRENCIES.map(c => `<option ${c===p.currency?'selected':''}>${c}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="f-label">الفترة</label>
+            <select class="f-input" id="pe-period" style="padding:10px 12px">
+              <option ${p.period==='month'?'selected':''} value="month">شهري</option>
+              <option ${p.period==='year'?'selected':''} value="year">سنوي</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div>
+            <label class="f-label">حد الأحرف (0 = غير محدود)</label>
+            <input class="f-input" id="pe-chars" type="number" min="0" value="${p.charsLimit||0}">
+          </div>
+          <div>
+            <label class="f-label">حد الملفات لكل مهمة</label>
+            <input class="f-input" id="pe-files" type="number" min="1" value="${p.filesLimit||10}">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:14px">
+          <div>
+            <label class="f-label">لون الخطة</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+              ${PLAN_COLORS.map(c => `<div onclick="document.getElementById('pe-color').value='${c}';document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('sel'));this.classList.add('sel')" 
+                class="color-swatch${p.color===c?' sel':''}" 
+                style="width:24px;height:24px;border-radius:50%;background:${c};cursor:pointer;border:2px solid ${p.color===c?'white':'transparent'};transition:border .15s"></div>`).join('')}
+            </div>
+            <input type="hidden" id="pe-color" value="${p.color}">
+          </div>
+          <div>
+            <label class="f-label">إبراز الخطة</label>
+            <label class="toggle" style="margin-top:10px;display:block">
+              <input type="checkbox" id="pe-highlighted" ${p.highlighted?'checked':''}>
+              <div class="toggle-track"></div><div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="f-label">المميزات (سطر واحد لكل ميزة)</label>
+          <textarea class="f-input" id="pe-features" rows="5" style="height:auto;resize:vertical">${(p.features||[]).join('\n')}</textarea>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="savePlan(${i})">💾 حفظ الخطة</button>
+      </div>
+    </div></div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function closePlanModal() {
+  const m = document.getElementById('plan-modal');
+  if (m) m.remove();
+}
+
+function savePlan(i) {
+  const p = currentPlans[i];
+  p.name        = document.getElementById('pe-name').value.trim();
+  p.nameEn      = document.getElementById('pe-name-en').value.trim();
+  p.description = document.getElementById('pe-desc').value.trim();
+  p.price       = parseFloat(document.getElementById('pe-price').value) || 0;
+  p.currency    = document.getElementById('pe-currency').value;
+  p.period      = document.getElementById('pe-period').value;
+  p.charsLimit  = parseInt(document.getElementById('pe-chars').value) || 0;
+  p.filesLimit  = parseInt(document.getElementById('pe-files').value) || 10;
+  p.color       = document.getElementById('pe-color').value;
+  p.highlighted = document.getElementById('pe-highlighted').checked;
+  p.features    = document.getElementById('pe-features').value.split('\n').map(f => f.trim()).filter(Boolean);
+  if (!p.name) return alert('الاسم مطلوب');
+  closePlanModal();
+  savePlansAndPayments();
+}
+
+// ── PAYMENTS EDITOR ───────────────────────────────────────────────────────────
+
+const PM_TYPES = [
+  { value:'wallet', label:'محفظة إلكترونية', icon:'👝' },
+  { value:'bank',   label:'تحويل بنكي',      icon:'🏦' },
+  { value:'paypal', label:'PayPal',           icon:'🅿️' },
+  { value:'contact',label:'تواصل مباشر',     icon:'📞' },
+];
+
+function renderPaymentsEditor() {
+  const el = document.getElementById('payments-editor');
+  if (!currentPayments.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px">لا توجد طرق دفع — اضغط + إضافة طريقة</div>';
+    return;
+  }
+  const typeMap = {};
+  PM_TYPES.forEach(t => typeMap[t.value] = t);
+  el.innerHTML = currentPayments.map((m, i) => {
+    const t = typeMap[m.type] || { icon:'💳', label: m.type };
+    return `<div style="background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <span style="font-size:20px">${t.icon}</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:700">${m.name}</div>
+            <div style="font-size:.74rem;color:var(--muted)">${t.label}${m.walletNumber ? ' · ' + m.walletNumber.slice(0,12)+'...' : ''}${m.iban ? ' · '+m.iban.slice(0,10)+'...' : ''}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="tbl-btn tbl-btn-upgrade" onclick="editPayment(${i})">✏️ تعديل</button>
+          <button class="tbl-btn tbl-btn-del" onclick="deletePayment(${i})">حذف</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addPaymentMethod() {
+  openPaymentModal(-1, { type:'wallet', name:'', walletNumber:'', bankName:'', accountName:'', iban:'', swift:'', paypalEmail:'', paypalLink:'', telegram:'', whatsapp:'', email:'' });
+}
+
+function editPayment(i) { openPaymentModal(i, currentPayments[i]); }
+
+function deletePayment(i) {
+  if (!confirm('حذف طريقة الدفع "' + currentPayments[i].name + '"؟')) return;
+  currentPayments.splice(i, 1);
+  savePlansAndPayments();
+}
+
+function openPaymentModal(idx, m) {
+  const isNew = idx === -1;
+  const html = `
+    <div class="modal-overlay open" id="pm-modal" onclick="if(event.target===this)closePMModal()">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-header">
+        <div class="modal-title">💳 ${isNew ? 'إضافة' : 'تعديل'} طريقة دفع</div>
+        <button class="modal-close" onclick="closePMModal()">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:72vh;overflow-y:auto">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div>
+            <label class="f-label">الاسم (يظهر للعملاء)</label>
+            <input class="f-input" id="pm-name" value="${m.name||''}" placeholder="مثال: زين كاش / STC Pay">
+          </div>
+          <div>
+            <label class="f-label">نوع الطريقة</label>
+            <select class="f-input" id="pm-type" style="padding:10px 12px" onchange="updatePMFields()">
+              ${PM_TYPES.map(t => `<option value="${t.value}"${m.type===t.value?' selected':''}>${t.icon} ${t.label}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
+        <div id="pm-fields">
+          <!-- rendered by updatePMFields() -->
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;margin-top:14px" onclick="savePM(${idx})">💾 حفظ طريقة الدفع</button>
+      </div>
+    </div></div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+  // Store temp data
+  window._pmTemp = Object.assign({}, m);
+  updatePMFields();
+}
+
+function updatePMFields() {
+  const type = document.getElementById('pm-type')?.value;
+  const m = window._pmTemp || {};
+  const el = document.getElementById('pm-fields');
+  if (!el) return;
+
+  if (type === 'wallet') {
+    el.innerHTML = `
+      <label class="f-label">رقم المحفظة / رمز الدفع</label>
+      <input class="f-input" id="pm-wallet" value="${m.walletNumber||''}" placeholder="05XXXXXXXX أو رمز الدفع">
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:12px">سيتم توليد باركود QR تلقائياً بهذا الرقم مع لوغو أمان</div>
+      <label class="f-label">ملاحظات إضافية (اختياري)</label>
+      <input class="f-input" id="pm-notes" value="${m.notes||''}" placeholder="مثال: متاح 24/7">`;
+  } else if (type === 'bank') {
+    el.innerHTML = `
+      <label class="f-label">اسم البنك</label>
+      <input class="f-input" id="pm-bank-name" value="${m.bankName||''}" placeholder="بنك الراجحي">
+      <label class="f-label">اسم صاحب الحساب</label>
+      <input class="f-input" id="pm-acc-name" value="${m.accountName||''}" placeholder="شركة أمان">
+      <label class="f-label">IBAN / رقم الحساب</label>
+      <input class="f-input" id="pm-iban" value="${m.iban||''}" placeholder="SA12 3456 7890">
+      <label class="f-label">SWIFT Code (اختياري)</label>
+      <input class="f-input" id="pm-swift" value="${m.swift||''}" placeholder="RJHISARIXXX">`;
+  } else if (type === 'paypal') {
+    el.innerHTML = `
+      <label class="f-label">PayPal Email</label>
+      <input class="f-input" id="pm-pp-email" value="${m.paypalEmail||''}" placeholder="pay@example.com">
+      <label class="f-label">رابط الدفع PayPal.me (اختياري)</label>
+      <input class="f-input" id="pm-pp-link" value="${m.paypalLink||''}" placeholder="https://paypal.me/username">`;
+  } else {
+    el.innerHTML = `
+      <label class="f-label">Telegram (اختياري)</label>
+      <input class="f-input" id="pm-tg" value="${m.telegram||''}" placeholder="@username">
+      <label class="f-label">WhatsApp (اختياري)</label>
+      <input class="f-input" id="pm-wa" value="${m.whatsapp||''}" placeholder="+966500000000">
+      <label class="f-label">البريد الإلكتروني (اختياري)</label>
+      <input class="f-input" id="pm-email" value="${m.email||''}" placeholder="admin@aman.app">`;
+  }
+}
+
+function savePM(idx) {
+  const type = document.getElementById('pm-type').value;
+  const name = document.getElementById('pm-name').value.trim();
+  if (!name) return alert('الاسم مطلوب');
+
+  const entry = { type, name, id: (window._pmTemp?.id) || ('pm_' + Date.now()) };
+
+  if (type === 'wallet') {
+    entry.walletNumber = document.getElementById('pm-wallet')?.value.trim() || '';
+    entry.notes = document.getElementById('pm-notes')?.value.trim() || '';
+  } else if (type === 'bank') {
+    entry.bankName    = document.getElementById('pm-bank-name')?.value.trim() || '';
+    entry.accountName = document.getElementById('pm-acc-name')?.value.trim() || '';
+    entry.iban        = document.getElementById('pm-iban')?.value.trim() || '';
+    entry.swift       = document.getElementById('pm-swift')?.value.trim() || '';
+  } else if (type === 'paypal') {
+    entry.paypalEmail = document.getElementById('pm-pp-email')?.value.trim() || '';
+    entry.paypalLink  = document.getElementById('pm-pp-link')?.value.trim() || '';
+  } else {
+    entry.telegram = document.getElementById('pm-tg')?.value.trim() || '';
+    entry.whatsapp = document.getElementById('pm-wa')?.value.trim() || '';
+    entry.email    = document.getElementById('pm-email')?.value.trim() || '';
+  }
+
+  if (idx === -1) currentPayments.push(entry);
+  else currentPayments[idx] = entry;
+
+  closePMModal();
+  savePlansAndPayments();
+}
+
+function closePMModal() {
+  const m = document.getElementById('pm-modal');
+  if (m) m.remove();
+  window._pmTemp = null;
+}
+
+// ── SAVE ALL ──────────────────────────────────────────────────────────────────
+async function savePlansAndPayments() {
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, {
+      method:'PUT', headers: headers(),
+      body: JSON.stringify({ plans: currentPlans, paymentMethods: currentPayments })
+    });
+    const d = await r.json();
+    if (r.ok) {
+      showPlansAlert('✅ تم الحفظ بنجاح', 'ok');
+      renderPlansEditor();
+      renderPaymentsEditor();
+    } else showPlansAlert(d.error, 'err');
+  } catch(e) { showPlansAlert('خطأ: ' + e.message, 'err'); }
+}
+
+function showPlansAlert(msg, type) {
+  const el = document.getElementById('plans-alert');
+  el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(() => el.innerHTML = '', 3000);
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
+
+var STATUS_LABELS = { pending:'⏳ قيد المراجعة', approved:'✅ موافق عليه', rejected:'❌ مرفوض' };
+var STATUS_COLORS = { pending:'tag-o', approved:'tag-g', rejected:'tag-r' };
+
+async function loadNotifs() {
+  setNavActive('notifs');
+  try {
+    const r = await fetch(`${API}/api/notifications`, { headers: headers() });
+    const d = await r.json();
+    const notifs = d.notifications || [];
+    const pending = notifs.filter(n => n.status === 'pending').length;
+    document.getElementById('notifs-sub').textContent = 
+      `${notifs.length} إشعار — ${pending} قيد المراجعة`;
+    renderNotifs(notifs);
+    updateBadge();
+  } catch(e) { 
+    document.getElementById('notifs-alert').innerHTML = 
+      `<div class="alert alert-err">خطأ: ${e.message}</div>`;
+  }
+}
+
+function renderNotifs(notifs) {
+  const tbody = document.getElementById('notifs-body');
+  if (!notifs.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">لا توجد إشعارات بعد</td></tr>';
+    return;
+  }
+  tbody.innerHTML = notifs.map(n => {
+    const date = new Date(n.createdAt).toLocaleString('ar-SA');
+    const statusCls = STATUS_COLORS[n.status] || 'tag-b';
+    const statusLbl = STATUS_LABELS[n.status] || n.status;
+    return `<tr style="${!n.read && n.status==='pending' ? 'background:rgba(201,168,76,.04)' : ''}">
+      <td class="mono" style="font-size:.72rem">${date}</td>
+      <td>
+        <div class="user-cell">
+          <div class="user-av-sm">${(n.payerName||n.userName||'؟')[0]}</div>
+          <div>
+            <div style="font-size:.84rem;font-weight:700">${n.payerName||n.userName||'—'}</div>
+            <div class="mono" style="font-size:.7rem">${n.payerEmail||n.userEmail||'—'}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="plan-badge plan-pro">${n.planName||n.planId||'—'}</span></td>
+      <td class="mono" style="color:var(--gold2);font-weight:700">${n.amount||'—'}</td>
+      <td style="font-size:.82rem">${n.method||'—'}</td>
+      <td><span class="tag ${statusCls}">${statusLbl}</span></td>
+      <td>
+        <div class="tbl-actions">
+          ${n.status==='pending' ? `
+            <button class="tbl-btn tbl-btn-upgrade" onclick="approveNotif('${n.id}','${n.planId||'pro'}')">✅ موافقة</button>
+            <button class="tbl-btn tbl-btn-del" onclick="rejectNotif('${n.id}')">❌ رفض</button>
+          ` : ''}
+          <button class="tbl-btn" style="background:rgba(96,165,250,.07);color:var(--blue);border:1px solid rgba(96,165,250,.2)" onclick="showNotifDetail('${n.id}')">📋</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function approveNotif(id, planId) {
+  if (!confirm('موافقة على هذه الدفعة وترقية المستخدم؟')) return;
+  try {
+    const r = await fetch(`${API}/api/notifications/${id}`, {
+      method: 'PUT', headers: headers(),
+      body: JSON.stringify({ status: 'approved', read: true })
+    });
+    if (r.ok) {
+      showPageAlert('✅ تمت الموافقة وترقية المستخدم!', 'ok');
+      loadNotifs();
+    }
+  } catch(e) { showPageAlert('خطأ: ' + e.message, 'err'); }
+}
+
+async function rejectNotif(id) {
+  const reason = prompt('سبب الرفض (اختياري):') || '';
+  try {
+    const r = await fetch(`${API}/api/notifications/${id}`, {
+      method: 'PUT', headers: headers(),
+      body: JSON.stringify({ status: 'rejected', read: true, adminNote: reason })
+    });
+    if (r.ok) {
+      showPageAlert('تم رفض الطلب.', 'info');
+      loadNotifs();
+    }
+  } catch(e) { showPageAlert('خطأ: ' + e.message, 'err'); }
+}
+
+function showNotifDetail(id) {
+  // Find notif in DOM is hard - re-fetch
+  fetch(`${API}/api/notifications`, { headers: headers() })
+    .then(r => r.json())
+    .then(d => {
+      const n = (d.notifications||[]).find(x => x.id === id);
+      if (!n) return;
+      const detail = [
+        n.note ? '📝 ' + n.note : '',
+        n.ref ? '🔖 مرجع: ' + n.ref : '',
+        n.adminNote ? '💬 ملاحظة المدير: ' + n.adminNote : '',
+        n.updatedAt ? '🕐 آخر تحديث: ' + new Date(n.updatedAt).toLocaleString('ar-SA') : '',
+      ].filter(Boolean).join('\n');
+      alert(detail || 'لا توجد تفاصيل إضافية');
+      // Mark as read
+      if (!n.read) fetch(`${API}/api/notifications/${id}`, {
+        method: 'PUT', headers: headers(),
+        body: JSON.stringify({ read: true })
+      });
+    });
+}
+
+async function updateBadge() {
+  try {
+    const r = await fetch(`${API}/api/notifications/count`, { headers: headers() });
+    const d = await r.json();
+    const badge = document.getElementById('notif-badge');
+    if (badge) {
+      if (d.unread > 0) {
+        badge.textContent = d.unread;
+        badge.style.display = '';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  } catch(e) {}
+}
+
+// Poll for new notifications every 30 seconds
+setInterval(function() {
+  if (adminToken) updateBadge();
+}, 30000);
+
+
+// ── ACTIVITY LOGS ──────────────────────────────────────────────────────────────
+const LOG_LABELS = {
+  register:'📝 تسجيل', login:'🔑 دخول', logout:'🚪 خروج',
+  profile_update:'✏️ تحديث ملف', payment_submit:'💳 دفعة جديدة',
+  payment_approved:'✅ موافقة دفعة', payment_rejected:'❌ رفض دفعة',
+};
+
+async function loadLogs() {
+  setNavActive('logs');
+  try {
+    const r = await fetch(`${API}/api/admin/logs`, { headers: headers() });
+    const d = await r.json();
+    const logs = d.logs || [];
+    const tbody = document.getElementById('logs-body');
+    if (!logs.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="4">لا توجد سجلات</td></tr>'; return; }
+    tbody.innerHTML = logs.map(l => {
+      const date = new Date(l.ts).toLocaleString('ar-SA');
+      const user = Object.values(DB?.users||{}).find?.(u=>u.id===l.userId);
+      const uName = user?.name || l.userId?.slice(0,8) || '—';
+      const label = LOG_LABELS[l.action] || l.action;
+      return `<tr>
+        <td class="mono" style="font-size:.72rem">${date}</td>
+        <td style="font-size:.82rem">${label}</td>
+        <td style="font-size:.82rem">${uName}</td>
+        <td class="mono" style="font-size:.72rem;color:var(--muted)">${l.detail||'—'}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.error('loadLogs error:', e); }
+}
+
+var DB = null; // We don't have client-side DB, just use user names from allUsers
+
+
+// ── SMTP ──────────────────────────────────────────────────────────────────────
+async function loadSmtp() {
+  setNavActive('smtp');
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, { headers: headers() });
+    const d = await r.json();
+    document.getElementById('smtp-host').value       = d.smtpHost    || '';
+    document.getElementById('smtp-port').value       = d.smtpPort    || 587;
+    document.getElementById('smtp-secure').checked   = !!d.smtpSecure;
+    document.getElementById('smtp-user').value       = d.smtpUser    || '';
+    document.getElementById('smtp-pass').value       = d.smtpPass && d.smtpPass.startsWith('....') ? '' : (d.smtpPass || '');
+    document.getElementById('smtp-from').value       = d.smtpFrom    || '';
+    document.getElementById('smtp-on-reg').checked      = d.emailOnRegister          !== false;
+    document.getElementById('smtp-on-payment').checked  = d.emailOnPaymentReceived   !== false;
+    document.getElementById('smtp-on-approved').checked = d.emailOnPaymentApproved   !== false;
+  } catch(e) { showAlert('smtp-alert', 'خطأ: ' + e.message, 'err'); }
+}
+
+async function saveSmtp() {
+  const pass = document.getElementById('smtp-pass').value;
+  const body = {
+    smtpHost    : document.getElementById('smtp-host').value.trim(),
+    smtpPort    : parseInt(document.getElementById('smtp-port').value) || 587,
+    smtpSecure  : document.getElementById('smtp-secure').checked,
+    smtpUser    : document.getElementById('smtp-user').value.trim(),
+    smtpFrom    : document.getElementById('smtp-from').value.trim(),
+    emailOnRegister         : document.getElementById('smtp-on-reg').checked,
+    emailOnPaymentReceived  : document.getElementById('smtp-on-payment').checked,
+    emailOnPaymentApproved  : document.getElementById('smtp-on-approved').checked,
+  };
+  if (pass) body.smtpPass = pass;
+  const r = await fetch(`${API}/api/admin/settings`, { method:'PUT', headers: headers(), body: JSON.stringify(body) });
+  const d = await r.json();
+  showAlert('smtp-alert', r.ok ? '✅ تم حفظ إعدادات SMTP' : (d.error || 'خطأ'), r.ok ? 'ok' : 'err');
+}
+
+async function testSmtp() {
+  const to = document.getElementById('smtp-test-to').value.trim();
+  if (!to) { showAlert('smtp-alert', 'أدخل بريد للاختبار', 'err'); return; }
+  const el = document.getElementById('smtp-test-result');
+  el.innerHTML = '<span style="color:var(--gold)">⏳ جاري الإرسال...</span>';
+  try {
+    const r = await fetch(`${API}/api/admin/test-smtp`, { method:'POST', headers: headers(), body: JSON.stringify({ to }) });
+    const d = await r.json();
+    el.innerHTML = r.ok
+      ? '<span style="color:var(--green)">✅ تم إرسال الإيميل بنجاح!</span>'
+      : '<span style="color:var(--red)">❌ ' + (d.error || 'فشل') + '</span>';
+  } catch(e) { el.innerHTML = '<span style="color:var(--red)">❌ ' + e.message + '</span>'; }
+}
+
+// ── WORKER ─────────────────────────────────────────────────────────────────────
+async function loadWorker() {
+  setNavActive('worker');
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, { headers: headers() });
+    const d = await r.json();
+    document.getElementById('wk-enabled').checked = !!d.useWorker;
+    document.getElementById('wk-url').value        = d.workerUrl    || '';
+    document.getElementById('wk-secret').value     = '';
+  } catch(e) { showAlert('worker-alert', 'خطأ: ' + e.message, 'err'); }
+}
+
+async function saveWorker() {
+  const secret = document.getElementById('wk-secret').value;
+  const body = {
+    useWorker : document.getElementById('wk-enabled').checked,
+    workerUrl : document.getElementById('wk-url').value.trim(),
+  };
+  if (secret) body.workerSecret = secret;
+  const r = await fetch(`${API}/api/admin/settings`, { method:'PUT', headers: headers(), body: JSON.stringify(body) });
+  const d = await r.json();
+  showAlert('worker-alert', r.ok ? '✅ تم حفظ إعدادات Worker' : (d.error||'خطأ'), r.ok ? 'ok' : 'err');
+}
+
+async function testWorker() {
+  const el = document.getElementById('worker-test-result');
+  el.innerHTML = '<span style="color:var(--gold)">⏳ جاري الاتصال...</span>';
+  try {
+    const r = await fetch(`${API}/api/admin/test-worker`, { method:'POST', headers: headers(), body: JSON.stringify({}) });
+    const d = await r.json();
+    el.innerHTML = r.ok
+      ? '<span style="color:var(--green)">✅ Worker يعمل! ' + JSON.stringify(d.workerResponse) + '</span>'
+      : '<span style="color:var(--red)">❌ ' + (d.error||'فشل') + '</span>';
+  } catch(e) { el.innerHTML = '<span style="color:var(--red)">❌ ' + e.message + '</span>'; }
+}
+
+// ── FIREBASE ────────────────────────────────────────────────────────────────────
+async function loadFirebase() {
+  setNavActive('firebase');
+  try {
+    const r = await fetch(`${API}/api/admin/settings`, { headers: headers() });
+    const d = await r.json();
+    document.getElementById('fb-enabled').checked = !!d.useFirebase;
+    document.getElementById('fb-project').value   = d.firebaseProject || '';
+    document.getElementById('fb-key').value       = d.firebaseKey && d.firebaseKey.startsWith('•••') ? '' : (d.firebaseKey || '');
+    if (d.firebaseKey && d.firebaseKey.startsWith('•••')) {
+      document.getElementById('fb-key').placeholder = '••• Service account key is set — leave empty to keep •••';
+    }
+  } catch(e) { showAlert('firebase-alert', 'خطأ: ' + e.message, 'err'); }
+}
+
+async function saveFirebase() {
+  const key = document.getElementById('fb-key').value.trim();
+  const body = {
+    useFirebase     : document.getElementById('fb-enabled').checked,
+    firebaseProject : document.getElementById('fb-project').value.trim(),
+  };
+  if (key) body.firebaseKey = key;
+  const r = await fetch(`${API}/api/admin/settings`, { method:'PUT', headers: headers(), body: JSON.stringify(body) });
+  const d = await r.json();
+  showAlert('firebase-alert', r.ok ? '✅ تم حفظ إعدادات Firebase' : (d.error||'خطأ'), r.ok ? 'ok' : 'err');
+}
+
+async function testFirebase() {
+  const el = document.getElementById('firebase-test-result');
+  el.innerHTML = '<span style="color:var(--gold)">⏳ جاري الاختبار...</span>';
+  try {
+    const r = await fetch(`${API}/api/admin/test-firebase`, { method:'POST', headers: headers(), body: JSON.stringify({}) });
+    const d = await r.json();
+    el.innerHTML = r.ok
+      ? '<span style="color:var(--green)">✅ Firebase Auth OK</span>'
+      : '<span style="color:var(--red)">❌ ' + (d.error||'فشل') + '</span>';
+  } catch(e) { el.innerHTML = '<span style="color:var(--red)">❌ ' + e.message + '</span>'; }
+}
+
+async function syncFirebase() {
+  const el = document.getElementById('firebase-test-result');
+  el.innerHTML = '<span style="color:var(--gold)">⏳ جاري المزامنة...</span>';
+  try {
+    const r = await fetch(`${API}/api/admin/firebase-sync`, { method:'POST', headers: headers(), body: JSON.stringify({}) });
+    const d = await r.json();
+    el.innerHTML = r.ok
+      ? '<span style="color:var(--green)">✅ تمت المزامنة مع Firebase</span>'
+      : '<span style="color:var(--red)">❌ ' + (d.error||'فشل') + '</span>';
+  } catch(e) { el.innerHTML = '<span style="color:var(--red)">❌ ' + e.message + '</span>'; }
+}
+
+// ── SHARED ALERT HELPER ────────────────────────────────────────────────────────
+function showAlert(elId, msg, type) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(() => { if(el) el.innerHTML = ''; }, 5000);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+checkAdminAuth();
+</script>
+</body>
+</html>
