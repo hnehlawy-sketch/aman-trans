@@ -1,16 +1,3 @@
-/**
- * ═══════════════════════════════════════════════════════════════
- *   Aman  v4.0  —  Full SaaS Server
- *   Node.js · Zero npm deps
- *   ✓ Auth + Rate-limit + Brute-force protection
- *   ✓ SMTP email (any provider: Gmail, Outlook, custom)
- *   ✓ Firebase Firestore (optional, falls back to data.json)
- *   ✓ Deno/CF Worker proxy for Gemini (bypasses geo-blocks)
- *   ✓ Translation jobs + history + cancel
- *   ✓ Payment notifications + admin approval
- *   ✓ Full admin panel
- * ═══════════════════════════════════════════════════════════════
- */
 
 'use strict';
 const http   = require('http');
