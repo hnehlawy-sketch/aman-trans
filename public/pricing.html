@@ -491,36 +491,38 @@ function buildTabs(){
 }
 
 function drawQR(idx) {
-  var m = payMethods[idx];
-  if (!m || m.type !== 'wallet' || !m.walletNumber) return;
+    var m = payMethods[idx];
+    if (!m || m.type !== 'wallet' || !m.walletNumber) return;
 
-  function attempt(tries) {
-    var c = document.getElementById('qr-c-' + idx);
-    if (!c) {
-      if (tries > 0) setTimeout(function() { attempt(tries - 1); }, 100);
-      return;
+    function attempt(tries) {
+        var c = document.getElementById('qr-c-' + idx);
+        if (!c) {
+            if (tries > 0) setTimeout(function() { attempt(tries - 1); }, 100);
+            return;
+        }
+
+        // 1. تصفير الـ Canvas تماماً وإعطاؤه حجماً كبيراً جداً كمنطقة عمل
+        c.width = 400; 
+        c.height = 400;
+        var ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, c.width, c.height); // تنظيف أي رسم سابق
+
+        try {
+            // 2. الرسم بحجم 250 داخل مساحة 400 
+            // هذا يضمن وجود فراغ أبيض شاسع حول الباركود يمنع القص مهما حدث
+            QRAman.draw(c, m.walletNumber, 250, '🛡️');
+            
+            // 3. ضبط الظهور عبر CSS
+            c.style.setProperty('width', '100%', 'important');
+            c.style.setProperty('height', 'auto', 'important');
+            c.style.padding = '20px'; // زيادة أمان إضافية
+            
+            c._drawn = true;
+        } catch (e) {
+            console.error("QR Render Error:", e);
+        }
     }
-
-    // --- الحل الجذري هنا ---
-    // 1. إعطاء الـ Canvas أبعاداً حقيقية مربعة وكبيرة كمنطقة عمل
-    c.width = 300; 
-    c.height = 300;
-
-    try {
-      // 2. الرسم بحجم 200 داخل مساحة 300 يضمن وجود هامش أمان أبيض (50px) من كل جهة
-      QRAman.draw(c, m.walletNumber, 200, '🛡️');
-      
-      // 3. منع الـ CSS من قص أي شيء
-      c.style.width = '100%';
-      c.style.height = 'auto';
-      c.style.objectFit = 'contain'; // يضمن عدم تمدد الصورة خارج حدودها
-      
-      c._drawn = true;
-    } catch (e) {
-      console.error("خطأ في رسم الباركود:", e);
-    }
-  }
-  setTimeout(function() { attempt(15); }, 500);
+    setTimeout(function() { attempt(15); }, 500);
 }
 function switchTab(btn,idx){
   document.querySelectorAll('.pm-tab').forEach(function(t){t.classList.remove('on');});
