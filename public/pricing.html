@@ -501,25 +501,24 @@ function drawQR(idx) {
             return;
         }
 
-        // 1. تثبيت أبعاد الكانفاس برمجياً ليكون مربعاً تماماً
-        c.width = 400; 
-        c.height = 400;
+        // --- التعديل السحري هنا ---
+        // 1. تصغير منطقة الكانفاس لتقليل البياض المحيط
+        c.width = 220; 
+        c.height = 220;
         var ctx = c.getContext('2d');
         ctx.clearRect(0, 0, c.width, c.height);
 
         try {
-            // 2. الحل السحري: نترك مساحة أبيض كبيرة جداً يدوياً
-            // سنرسم الباركود في "طبقة" أصغر داخل الكانفاس
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, 400, 400); // خلفية بيضاء كاملة
-
-            // تقليل الحجم لـ 240 داخل مساحة 400 يضمن بقاء الباركود في المنتصف وكاملاً
-            QRAman.draw(c, m.walletNumber, 240, '🛡️');
+            // 2. رسم الباركود بحجم 220 (يملأ الكانفاس بالكامل)
+            // إذا استمر القص، سنقلل القيمة لـ 210
+            QRAman.draw(c, m.walletNumber, 220, '🛡️');
             
-            // 3. ضبط التنسيق لضمان عدم وجود تمدد (Stretch)
+            // 3. منع المتصفح من إضافة أي هوامش CSS
             c.style.width = '240px'; 
             c.style.height = '240px';
-            c.style.margin = 'auto';
+            c.style.padding = '0';
+            c.style.margin = '0 auto';
+            c.style.border = 'none';
             c.style.display = 'block';
             
             c._drawn = true;
@@ -527,7 +526,7 @@ function drawQR(idx) {
             console.error("QR Draw Error:", e);
         }
     }
-    setTimeout(function() { attempt(20); }, 600);
+    setTimeout(function() { attempt(20); }, 500);
 }
 function switchTab(btn,idx){
   document.querySelectorAll('.pm-tab').forEach(function(t){t.classList.remove('on');});
