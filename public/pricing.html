@@ -492,41 +492,35 @@ function buildTabs(){
 
 function drawQR(idx) {
     var m = payMethods[idx];
-    if (!m || m.type !== 'wallet' || !m.walletNumber) return;
+    if (!m || !m.walletNumber) return;
 
     function attempt(tries) {
         var c = document.getElementById('qr-c-' + idx);
         if (!c) {
-            if (tries > 0) setTimeout(function() { attempt(tries - 1); }, 100);
+            if (tries > 0) setTimeout(() => attempt(tries - 1), 100);
             return;
         }
 
-        // --- التعديل السحري هنا ---
-        // 1. تصغير منطقة الكانفاس لتقليل البياض المحيط
-        c.width = 220; 
-        c.height = 220;
-        var ctx = c.getContext('2d');
-        ctx.clearRect(0, 0, c.width, c.height);
-
+        // إجبار الكانفاس على حجم ثابت وصغير (200x200)
+        c.width = 200;
+        c.height = 200;
+        
         try {
-            // 2. رسم الباركود بحجم 220 (يملأ الكانفاس بالكامل)
-            // إذا استمر القص، سنقلل القيمة لـ 210
-            QRAman.draw(c, m.walletNumber, 220, '🛡️');
+            // محاولة الرسم بدون "Logo" أو "Icon" في الوسط أولاً للتأكد
+            // أحياناً الأيقونة (الدرع) هي التي تسبب إزاحة الرسم للخارج
+            QRAman.draw(c, m.walletNumber.trim(), 200); 
             
-            // 3. منع المتصفح من إضافة أي هوامش CSS
-            c.style.width = '240px'; 
+            // إذا نجح الرسم بدون الدرع وظهر كاملاً، المشكلة في حجم الأيقونة
+            // إذا استمر القص، فالمشكلة في نسخة الـ QR نفسها
+            
+            c.style.width = '240px';
             c.style.height = '240px';
-            c.style.padding = '0';
-            c.style.margin = '0 auto';
-            c.style.border = 'none';
-            c.style.display = 'block';
-            
             c._drawn = true;
         } catch (e) {
-            console.error("QR Draw Error:", e);
+            console.error("QR Logical Error:", e);
         }
     }
-    setTimeout(function() { attempt(20); }, 500);
+    setTimeout(() => attempt(15), 500);
 }
 function switchTab(btn,idx){
   document.querySelectorAll('.pm-tab').forEach(function(t){t.classList.remove('on');});
