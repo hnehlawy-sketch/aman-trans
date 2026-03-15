@@ -491,42 +491,43 @@ function buildTabs(){
 }
 
 function drawQR(idx) {
-  var m = payMethods[idx];
-  if (!m || m.type !== 'wallet' || !m.walletNumber) return;
+    var m = payMethods[idx];
+    if (!m || m.type !== 'wallet' || !m.walletNumber) return;
 
-  function attempt(tries) {
-    var c = document.getElementById('qr-c-' + idx);
-    if (!c) {
-      if (tries > 0) setTimeout(function() { attempt(tries - 1); }, 100);
-      return;
+    function attempt(tries) {
+        var c = document.getElementById('qr-c-' + idx);
+        if (!c) {
+            if (tries > 0) setTimeout(function() { attempt(tries - 1); }, 100);
+            return;
+        }
+
+        // 1. تثبيت أبعاد الكانفاس برمجياً ليكون مربعاً تماماً
+        c.width = 400; 
+        c.height = 400;
+        var ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, c.width, c.height);
+
+        try {
+            // 2. الحل السحري: نترك مساحة أبيض كبيرة جداً يدوياً
+            // سنرسم الباركود في "طبقة" أصغر داخل الكانفاس
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, 400, 400); // خلفية بيضاء كاملة
+
+            // تقليل الحجم لـ 240 داخل مساحة 400 يضمن بقاء الباركود في المنتصف وكاملاً
+            QRAman.draw(c, m.walletNumber, 240, '🛡️');
+            
+            // 3. ضبط التنسيق لضمان عدم وجود تمدد (Stretch)
+            c.style.width = '240px'; 
+            c.style.height = '240px';
+            c.style.margin = 'auto';
+            c.style.display = 'block';
+            
+            c._drawn = true;
+        } catch (e) {
+            console.error("QR Draw Error:", e);
+        }
     }
-
-    // 1. تثبيت أبعاد الـ Canvas (منطقة العمل الحقيقية)
-    c.width = 300; 
-    c.height = 300;
-    var ctx = c.getContext('2d');
-    
-    // تنظيف أي محاولة رسم سابقة
-    ctx.clearRect(0, 0, c.width, c.height);
-
-    try {
-      // 2. الرسم بحجم 260 داخل مساحة 300 
-      // هذا يترك هامش 20px فقط من كل جهة، مما يكبر الباركود ويمنع القص
-      QRAman.draw(c, m.walletNumber, 260, '🛡️');
-      
-      // 3. ضبط التنسيق لملء الصندوق الأبيض في الواجهة
-      c.style.width = '100%';
-      c.style.height = '100%';
-      c.style.maxWidth = '260px'; // حجم مثالي للمسح بالكاميرا
-      c.style.display = 'block';
-      c.style.margin = '0 auto';
-      
-      c._drawn = true;
-    } catch (e) {
-      console.error("QR Error:", e);
-    }
-  }
-  setTimeout(function() { attempt(15); }, 500);
+    setTimeout(function() { attempt(20); }, 600);
 }
 function switchTab(btn,idx){
   document.querySelectorAll('.pm-tab').forEach(function(t){t.classList.remove('on');});
