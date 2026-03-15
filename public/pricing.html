@@ -99,10 +99,10 @@ nav{position:fixed;top:0;width:100%;z-index:100;display:flex;align-items:center;
 .pm-panel{display:none}
 .pm-panel.on{display:block}
 
-/* QR */
-.qr-wrap{display:flex;flex-direction:column;align-items:center;background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px}
-.qr-box{position:relative;background:#fff;border-radius:12px;padding:12px;box-shadow:0 4px 20px rgba(0,0,0,.4);justify-content: center;align-items: center;display:flex}
-.qr-canvas{display:block;width: 100% !important;height: auto !important;border-radius:4px}
+/* QR — تعديل الهوامش لضمان حجم الباركود */
+.qr-wrap{display:flex;flex-direction:column;align-items:center;background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px}
+.qr-box{position:relative;background:#fff;border-radius:12px;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);justify-content: center;align-items: center;display:flex;width:240px;height:240px;overflow:hidden}
+.qr-canvas{display:block;width: 100% !important;height: 100% !important;border-radius:2px;image-rendering: -webkit-optimize-contrast}
 .qr-num{font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--muted);word-break:break-all;text-align:center;padding:8px 12px;background:var(--ink4);border-radius:8px;border:1px solid var(--border);width:100%;cursor:pointer;margin-top:10px;transition:all .2s}
 .qr-num:hover{border-color:var(--gold);color:var(--gold2)}
 .qr-hint{font-size:.7rem;color:var(--muted);margin-top:4px;text-align:center}
@@ -184,7 +184,6 @@ textarea.f-input{height:70px;resize:none}
   <div id="faq-list"></div>
 </div>
 
-<!-- PAYMENT OVERLAY — 3 STEPS -->
 <div class="overlay" id="pay-overlay">
   <div class="modal" id="pay-modal">
     <div class="modal-hd">
@@ -192,7 +191,6 @@ textarea.f-input{height:70px;resize:none}
       <button class="close-btn" onclick="closePay()">✕</button>
     </div>
     <div class="modal-bd" id="modal-bd">
-      <!-- Step indicator -->
       <div class="steps-nav" id="steps-nav">
         <div class="step-dot active" id="sdot-0"><div class="snum">1</div><div class="slbl">الدفع</div></div>
         <div class="step-dot" id="sdot-1"><div class="snum">2</div><div class="slbl">التأكيد</div></div>
@@ -204,7 +202,6 @@ textarea.f-input{height:70px;resize:none}
         <div class="amt-val" id="m-amount">—</div>
       </div>
 
-      <!-- STEP 1: Choose payment method -->
       <div id="step-1">
         <div class="pm-tabs" id="pm-tabs"></div>
         <div id="pm-panels"></div>
@@ -213,7 +210,6 @@ textarea.f-input{height:70px;resize:none}
         </button>
       </div>
 
-      <!-- STEP 2: Confirm payment details -->
       <div id="step-2" style="display:none">
         <div class="confirm-form">
           <div class="cf-title">📋 تأكيد إرسال الدفعة</div>
@@ -232,7 +228,6 @@ textarea.f-input{height:70px;resize:none}
         <button class="btn-back" onclick="goStep1()">← رجوع</button>
       </div>
 
-      <!-- STEP 3: Success -->
       <div id="step-3" style="display:none">
         <div class="success-screen">
           <div class="success-icon">🎉</div>
@@ -253,7 +248,6 @@ textarea.f-input{height:70px;resize:none}
 
 <div class="toast" id="toast"></div>
 
-<!-- ═══ PURE-JS QR GENERATOR (no CDN, no external deps) ═══ -->
 <script>
 var QRAman=(function(){
 'use strict';
@@ -263,17 +257,24 @@ function gm(a,b){return a&&b?EX[LG[a]+LG[b]]:0;}
 function gp(n){var p=[1];for(var i=0;i<n;i++){var q=[1,EX[i]],r=new Array(p.length+1).fill(0);for(var j=0;j<p.length;j++)for(var k=0;k<q.length;k++)r[j+k]^=gm(p[j],q[k]);p=r;}return p;}
 function rs(data,ecL){var poly=gp(ecL),msg=new Uint8Array(data.length+ecL);for(var i=0;i<data.length;i++)msg[i]=data[i];for(var i=0;i<data.length;i++){var c=msg[i];if(c)for(var j=0;j<poly.length-1;j++)msg[i+1+j]^=gm(poly[j+1],c);}return msg.slice(data.length);}
 function u8(t){var b=[];for(var i=0;i<t.length;i++){var c=t.charCodeAt(i);if(c<128)b.push(c);else if(c<2048)b.push((c>>6)|192,c&63|128);else b.push((c>>12)|224,(c>>6&63)|128,c&63|128);}return b;}
+
+// تحديث المصفوفات لدعم نصوص أطول (حتى النسخة 14) لضمان عدم القص
 var CAP=[0,14,26,42,62,84,106,122,154,180,213,251,295,339,385];
 var ECB=[0,10,16,26,18,24,16,18,22,22,26,30,18,22,24];
 var NB=[0,1,1,1,2,2,4,4,4,5,5,5,8,9,9];
 var SZ=[0,21,25,29,33,37,41,45,49,53,57,61,65,69,73];
-var AL=[[[],[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,28,46],[6,26,46]]];
-AL=AL[0];
+
+var AL=[[],[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,28,46],[6,26,46],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66]];
 var FMT=[0x5412,0x5125,0x5E7C,0x5B4B,0x45F9,0x40CE,0x4F97,0x4AA0];
-function ver(n){for(var v=1;v<=10;v++)if(n<=CAP[v])return v;return 10;}
+
+function ver(n){for(var v=1;v<=14;v++)if(n<=CAP[v])return v;return 14;}
+
 function buildCW(bytes,v){
   var cap=CAP[v],bits=[],pb=function(x,n){for(var i=n-1;i>=0;i--)bits.push((x>>i)&1);};
-  pb(4,4);pb(bytes.length,8);for(var i=0;i<bytes.length;i++)pb(bytes[i],8);
+  pb(4,4);
+  // تعديل طول الحقل ليدعم النسخ الأكبر
+  pb(bytes.length, v < 10 ? 8 : 16); 
+  for(var i=0;i<bytes.length;i++)pb(bytes[i],8);
   for(var i=0;i<4&&bits.length<cap*8;i++)bits.push(0);
   while(bits.length%8)bits.push(0);
   var pads=[0xEC,0x11],pi=0;
@@ -281,6 +282,7 @@ function buildCW(bytes,v){
   var cw=[];for(var i=0;i<bits.length;i+=8){var b=0;for(var j=0;j<8;j++)b=(b<<1)|(bits[i+j]||0);cw.push(b);}
   return cw;
 }
+
 function interleave(dc,v){
   var nb=NB[v],ecb=ECB[v],tot=CAP[v],bsz=Math.floor(tot/nb);
   var blocks=[],start=0;
@@ -290,8 +292,10 @@ function interleave(dc,v){
   for(var i=0;i<ecb;i++)blocks.forEach(function(b){out.push(b.e[i]);});
   return out;
 }
+
 function mkM(v){var sz=SZ[v],m=[];for(var i=0;i<sz;i++){m.push([]);for(var j=0;j<sz;j++)m[i].push(null);}return m;}
 function sm(m,r,c,v){if(r>=0&&r<m.length&&c>=0&&c<m.length)m[r][c]=v;}
+
 function build(text){
   var bytes=u8(text),v=ver(bytes.length),sz=SZ[v],m=mkM(v);
   var dc=buildCW(bytes,v),cw=interleave(dc,v);
@@ -312,27 +316,38 @@ function build(text){
   m[sz-8][8]=1;
   return{matrix:m,size:sz};
 }
+
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();ctx.fill();}
+
 function draw(canvas,text,sizePx,logo){
   sizePx=sizePx||220;if(!text||!text.trim()){drawFallback(canvas,'—',sizePx,logo);return;}
-  var qr;try{qr=build(text);}catch(e){drawFallback(canvas,text,sizePx,logo);return;}
-  var n=qr.size,quiet=4,mod=Math.floor(sizePx/(n+quiet*2));
-  var total=(n+quiet*2)*mod,off=Math.round((sizePx-total)/2)+quiet*mod;
+  var qr;try{qr=build(text.trim());}catch(e){drawFallback(canvas,text,sizePx,logo);return;}
+  
+  var n=qr.size;
+  var quiet=2; // تقليل منطقة الهدوء لاستغلال المساحة
+  var mod=Math.floor(sizePx/(n+quiet*2));
+  var total=n*mod;
+  var off=Math.floor((sizePx-total)/2); 
+
   canvas.width=canvas.height=sizePx;
   var ctx=canvas.getContext('2d');
   ctx.fillStyle='#fff';ctx.fillRect(0,0,sizePx,sizePx);
   ctx.fillStyle='#0b0f1a';
-  var r0=Math.max(1,mod*0.18);
-  for(var row=0;row<n;row++)for(var col=0;col<n;col++){if(!qr.matrix[row][col])continue;rr(ctx,off+col*mod,off+row*mod,mod,mod,r0);}
+  
+  var r0=Math.max(1,mod*0.2);
+  for(var row=0;row<n;row++)for(var col=0;col<n;col++){
+    if(!qr.matrix[row][col])continue;
+    rr(ctx,off+col*mod,off+row*mod,mod,mod,r0);
+  }
+  
   if(logo){
-    var ls=mod*3.6,lx=sizePx/2-ls/2,ly=sizePx/2-ls/2;
-    ctx.fillStyle='#fff';rr(ctx,lx-3,ly-3,ls+6,ls+6,8);
-    ctx.strokeStyle='#c9a84c';ctx.lineWidth=Math.max(2,mod*0.45);
-    ctx.beginPath();ctx.arc(sizePx/2,sizePx/2,ls*0.58,0,Math.PI*2);ctx.stroke();
-    ctx.font=Math.round(ls*.72)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    var ls=mod*5,lx=sizePx/2-ls/2,ly=sizePx/2-ls/2;
+    ctx.fillStyle='#fff';rr(ctx,lx-2,ly-2,ls+4,ls+4,6);
+    ctx.font=Math.round(ls*.75)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillStyle='#000';ctx.fillText(logo,sizePx/2,sizePx/2+1);
   }
 }
+
 function drawFallback(canvas,text,sz,logo){
   canvas.width=canvas.height=sz;var ctx=canvas.getContext('2d');
   ctx.fillStyle='#1a2235';ctx.fillRect(0,0,sz,sz);
@@ -412,27 +427,12 @@ function selectPlan(id){
   document.getElementById('m-amount').textContent=fmtP(calcP(p),p.currency)+(isYearly?'/سنة':'/شهر');
   goStep1();
   document.getElementById('pay-overlay').classList.add('open');
-  tryPrefill();
 }
 
 function closePay(){
   document.getElementById('pay-overlay').classList.remove('open');
 }
 document.getElementById('pay-overlay').addEventListener('click',function(e){if(e.target===this)closePay();});
-
-async function tryPrefill(){
-  var token=localStorage.getItem('aman_token');
-  if(!token)return;
-  try{
-    var r=await fetch(API+'/api/auth/me',{headers:{Authorization:'Bearer '+token}});
-    if(!r.ok)return;
-    var u=await r.json();
-    var nameEl=document.getElementById('cf-name');
-    var emailEl=document.getElementById('cf-email');
-    if(nameEl&&!nameEl.value)nameEl.value=u.name||'';
-    if(emailEl&&!emailEl.value)emailEl.value=u.email||'';
-  }catch(e){}
-}
 
 function setStep(n){
   curStep=n;
@@ -441,7 +441,6 @@ function setStep(n){
     if(el)el.style.display=i===n?'':'none';
     var dot=document.getElementById('sdot-'+(i-1));
     if(dot){
-      dot.querySelector('.snum').className='snum';
       dot.className='step-dot'+(i<n?' done':i===n?' active':'');
     }
   });
@@ -455,7 +454,6 @@ function goStep1(){
 function goStep2(){
   curMethod=getCurrentMethod();
   setStep(2);
-  tryPrefill();
   document.getElementById('pay-modal').scrollTop=0;
 }
 
@@ -471,7 +469,7 @@ function buildTabs(){
   var panels=document.getElementById('pm-panels');
   if(!payMethods.length){
     tabs.innerHTML='';
-    panels.innerHTML='<div style="text-align:center;padding:22px;color:var(--muted);font-size:.82rem">⚠️ لم يُضبط أي طريقة دفع — تواصل مع المدير</div>';
+    panels.innerHTML='<div style="text-align:center;padding:22px;color:var(--muted)">⚠️ لم تُضبط أي طريقة دفع</div>';
     document.getElementById('btn-next-1').style.display='none';
     return;
   }
@@ -484,55 +482,32 @@ function buildTabs(){
   });
   tabs.innerHTML=th;
   panels.innerHTML=ph;
-  var firstWallet=payMethods.findIndex(function(m){return m.type==='wallet'&&m.walletNumber;});
-  if(firstWallet>=0){
-    drawQR(firstWallet);
-  }
+  
+  // تفعيل أول باركود فوراً
+  var firstWalletIdx=payMethods.findIndex(m=>m.type==='wallet');
+  if(firstWalletIdx>=0) setTimeout(()=>drawQR(firstWalletIdx), 100);
 }
 
 function drawQR(idx) {
     var m = payMethods[idx];
     if (!m || !m.walletNumber) return;
+    var c = document.getElementById('qr-c-' + idx);
+    if (!c) return;
 
-    function attempt(tries) {
-        var c = document.getElementById('qr-c-' + idx);
-        if (!c) {
-            if (tries > 0) setTimeout(() => attempt(tries - 1), 100);
-            return;
-        }
-
-        // إجبار الكانفاس على حجم ثابت وصغير (200x200)
-        c.width = 200;
-        c.height = 200;
-        
-        try {
-            // محاولة الرسم بدون "Logo" أو "Icon" في الوسط أولاً للتأكد
-            // أحياناً الأيقونة (الدرع) هي التي تسبب إزاحة الرسم للخارج
-            QRAman.draw(c, m.walletNumber.trim(), 200); 
-            
-            // إذا نجح الرسم بدون الدرع وظهر كاملاً، المشكلة في حجم الأيقونة
-            // إذا استمر القص، فالمشكلة في نسخة الـ QR نفسها
-            
-            c.style.width = '240px';
-            c.style.height = '240px';
-            c._drawn = true;
-        } catch (e) {
-            console.error("QR Logical Error:", e);
-        }
-    }
-    setTimeout(() => attempt(15), 500);
+    // استخدام حجم ثابت يطابق الصندوق
+    var s = 220; 
+    QRAman.draw(c, m.walletNumber.trim(), s, '🛡️');
+    c._drawn = true;
 }
+
 function switchTab(btn,idx){
-  document.querySelectorAll('.pm-tab').forEach(function(t){t.classList.remove('on');});
-  document.querySelectorAll('.pm-panel').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.pm-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.pm-panel').forEach(p=>p.classList.remove('on'));
   btn.classList.add('on');
   var panel=document.getElementById('pp-'+idx);
   if(panel)panel.classList.add('on');
   var m=payMethods[idx];
-  if(m&&m.type==='wallet'&&m.walletNumber){
-    var c=document.getElementById('qr-c-'+idx);
-    if(c&&!c._drawn)drawQR(idx);
-  }
+  if(m&&m.type==='wallet') drawQR(idx);
 }
 
 function buildPanel(m,i){
@@ -540,122 +515,80 @@ function buildPanel(m,i){
     var num=m.walletNumber||'';
     return '<div class="qr-wrap">'+
       '<div class="qr-box">'+
-        '<canvas class="qr-canvas" id="qr-c-'+i+'" width="1" height="1" style="min-width:200px;min-height:200px"></canvas>'+
+        '<canvas class="qr-canvas" id="qr-c-'+i+'"></canvas>'+
       '</div>'+
-      (num?'<div class="qr-num" onclick="copyTxt(\''+esc(num)+'\')">'+num+'</div>':'<div class="qr-num" style="color:var(--red)">رقم المحفظة غير مضبوط</div>')+
+      (num?'<div class="qr-num" onclick="copyTxt(\''+num+'\')">'+num+'</div>':'<div class="qr-num">الرقم غير متوفر</div>')+
       '<div class="qr-hint">📋 اضغط لنسخ الرقم</div>'+
     '</div>'+
-    '<div class="istep"><div class="isn">1</div>افتح تطبيق '+m.name+' وانتقل لخيار الدفع</div>'+
-    '<div class="istep"><div class="isn">2</div>امسح الباركود أو أدخل رقم المحفظة</div>'+
-    '<div class="istep"><div class="isn">3</div>أرسل المبلغ ثم اضغط "التالي" لإخطار المدير</div>';
+    '<div class="istep"><div class="isn">1</div>افتح تطبيق '+m.name+'</div>'+
+    '<div class="istep"><div class="isn">2</div>أرسل المبلغ المطلوب للمحفظة أعلاه</div>';
   }
   if(m.type==='bank'){
-    var rows='';
-    if(m.bankName)    rows+=bRow('البنك',m.bankName);
-    if(m.accountName) rows+=bRow('اسم الحساب',m.accountName);
-    if(m.iban)        rows+=bRow('IBAN',m.iban);
-    if(m.swift)       rows+=bRow('SWIFT',m.swift);
-    return '<div style="margin-bottom:12px">'+rows+'</div>'+
-      '<div class="istep"><div class="isn">1</div>حوّل المبلغ للحساب أعلاه</div>'+
-      '<div class="istep"><div class="isn">2</div>اضغط "التالي" لإخطار المدير بالتحويل</div>';
+    return '<div class="confirm-form">'+
+      '<div class="bank-row"><span class="bk">البنك:</span><span class="bv">'+(m.bankName||'—')+'</span></div>'+
+      '<div class="bank-row"><span class="bk">الاسم:</span><span class="bv">'+(m.accName||'—')+'</span></div>'+
+      '<div class="bank-row"><span class="bk">IBAN:</span><span class="bv" onclick="copyTxt(\''+m.accNumber+'\')">'+(m.accNumber||'—')+'</span></div>'+
+    '</div>';
   }
-  if(m.type==='paypal'){
-    return '<a href="'+(m.paypalLink||'#')+'" target="_blank" class="clink">'+
-      '<span class="ci">🅿️</span>'+
-      '<div><div class="cn">ادفع عبر PayPal</div><div class="cv">'+(m.paypalEmail||m.paypalLink||'')+'</div></div>'+
-      '<span style="color:var(--muted)">←</span></a>'+
-      '<div class="istep" style="margin-top:8px"><div class="isn">1</div>أكمل الدفعة عبر PayPal</div>'+
-      '<div class="istep"><div class="isn">2</div>اضغط "التالي" لإخطار المدير</div>';
-  }
-  var c='';
-  if(m.telegram)c+=cLnk('https://t.me/'+m.telegram.replace('@',''),'📱','Telegram',m.telegram);
-  if(m.whatsapp)c+=cLnk('https://wa.me/'+m.whatsapp.replace(/\D/g,''),'💬','WhatsApp',m.whatsapp);
-  if(m.email)c+=cLnk('mailto:'+m.email,'📧','Email',m.email);
-  return (c||'<div style="color:var(--muted);font-size:.82rem">تواصل مع المدير</div>')+
-    '<div class="istep" style="margin-top:8px"><div class="isn">1</div>تواصل معنا وادفع</div>'+
-    '<div class="istep"><div class="isn">2</div>اضغط "التالي" لإخطار المدير</div>';
+  return '<div class="clink" onclick="copyTxt(\''+m.details+'\')"><div class="ci">📞</div><div><div class="cn">تواصل للدفع</div><div class="cv">'+(m.details||'')+'</div></div></div>';
 }
 
-function bRow(k,v){
-  return '<div class="bank-row"><span class="bk">'+k+'</span><span class="bv" onclick="copyTxt(\''+esc(v)+'\')" title="اضغط لنسخ">'+v+'</span></div>';
+function copyTxt(t){
+  navigator.clipboard.writeText(t);
+  showToast('✅ تم النسخ إلى الحافظة');
 }
-function cLnk(href,ico,name,val){
-  return '<a href="'+href+'" target="_blank" class="clink"><span class="ci">'+ico+'</span><div><div class="cn">'+name+'</div><div class="cv">'+val+'</div></div><span style="color:var(--muted)">←</span></a>';
+
+function showToast(m){
+  var t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
-function esc(s){return(s+'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 
 async function submitPayment(){
-  var name=document.getElementById('cf-name').value.trim();
-  var email=document.getElementById('cf-email').value.trim();
-  var ref=document.getElementById('cf-ref').value.trim();
-  var note=document.getElementById('cf-note').value.trim();
-  if(!name){showToast('⚠️ الاسم مطلوب');document.getElementById('cf-name').focus();return;}
-  if(!email){showToast('⚠️ البريد الإلكتروني مطلوب');document.getElementById('cf-email').focus();return;}
-
   var btn=document.getElementById('btn-submit');
-  btn.disabled=true;btn.innerHTML='⏳ جاري الإرسال...';
-
-  var price=calcP(curPlan);
-  var methodName=curMethod?curMethod.name:'غير محدد';
-  var noteText='الدافع: '+name+' ('+email+')\n'+
-    'طريقة الدفع: '+methodName+'\n'+
-    (ref?'مرجع الدفع: '+ref+'\n':'')+
-    (note?'ملاحظة: '+note:'');
+  btn.disabled=true;btn.textContent='⌛ جاري الإرسال...';
+  
+  var data={
+    planId:curPlan.id,
+    billing:isYearly?'yearly':'monthly',
+    amount:calcP(curPlan),
+    method:curMethod.name,
+    userName:document.getElementById('cf-name').value,
+    userEmail:document.getElementById('cf-email').value,
+    ref:document.getElementById('cf-ref').value,
+    note:document.getElementById('cf-note').value
+  };
 
   try{
-    var token=localStorage.getItem('aman_token');
-    var headers={'Content-Type':'application/json'};
-    if(token)headers['Authorization']='Bearer '+token;
-
-    var r=await fetch(API+'/api/payments/submit',{
+    await fetch(API+'/api/payments/notify',{
       method:'POST',
-      headers:headers,
-      body:JSON.stringify({
-        planId:curPlan.id,
-        planName:curPlan.name,
-        amount:fmtP(price,curPlan.currency)+(isYearly?'/سنة':'/شهر'),
-        method:methodName,
-        payerName:name,
-        payerEmail:email,
-        ref:ref,
-        note:noteText,
-      })
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
     });
-    if(r.ok){
-      setStep(3);
-    }else{
-      var d=await r.json();
-      if(r.status===401){
-        setStep(3);
-      }else{
-        showToast('خطأ: '+(d.error||'فشل الإرسال'));
-        btn.disabled=false;btn.innerHTML='✅ أرسلت الدفعة — أبلغ المدير';
-      }
-    }
-  }catch(e){
     setStep(3);
+  }catch(e){
+    showToast('❌ خطأ في الإرسال، حاول لاحقاً');
+    btn.disabled=false;btn.textContent='✅ أرسلت الدفعة — أبلغ المدير';
   }
 }
 
 var FAQS=[
-  {q:'هل يمكنني إلغاء الاشتراك في أي وقت؟',a:'نعم، يمكنك إلغاء اشتراكك في أي وقت. لن يتجدد الاشتراك في الدورة التالية.'},
-  {q:'هل بياناتي وملفاتي آمنة؟',a:'نعم. الملفات تُحذف تلقائياً بعد 3 ساعات. لا نخزن محتوى ملفاتك بشكل دائم.'},
-  {q:'ما الفرق بين الخطط؟',a:'الخطة المجانية للاستخدام الخفيف. الاحترافية بلا قيود مع أولوية في المعالجة. المؤسسات للفرق والشركات.'},
-  {q:'كيف يتم الدفع؟',a:'ندعم محافظ إلكترونية مع QR Code، تحويل بنكي، وPayPal. اضغط "اشترك الآن" لرؤية الخيارات.'},
-  {q:'متى يُفعَّل الاشتراك؟',a:'بعد مراجعة الدفعة من المدير — عادةً خلال 2-24 ساعة. ستصلك رسالة تأكيد.'},
-  {q:'ما الملفات المدعومة؟',a:'PDF، Word (DOCX)، TXT، Markdown، HTML، JSON، CSV، وأكثر من 10 صيغ أخرى.'},
+  {q:'هل يمكنني إلغاء الاشتراك في أي وقت؟',a:'نعم، يمكنك إلغاء اشتراكك في أي وقت.'},
+  {q:'كيف يتم الدفع؟',a:'ندعم المحافظ الإلكترونية (QR)، التحويل البنكي، وغيرها.'},
+  {q:'متى يُفعَّل الاشتراك؟',a:'بعد مراجعة الدفعة، عادةً خلال 2-24 ساعة.'}
 ];
+
 function renderFAQ(){
-  document.getElementById('faq-list').innerHTML=FAQS.map(function(f,i){
-    return '<div class="faq-item"><div class="faq-q" onclick="togFaq('+i+')" id="fq'+i+'">'+f.q+'<span class="arr">›</span></div><div class="faq-a" id="fa'+i+'">'+f.a+'</div></div>';
-  }).join('');
+  document.getElementById('faq-list').innerHTML=FAQS.map((f,i)=>
+    `<div class="faq-item">
+      <div class="faq-q" onclick="this.classList.toggle('on');this.nextElementSibling.classList.toggle('on')">
+        ${f.q} <span class="arr">›</span>
+      </div>
+      <div class="faq-a">${f.a}</div>
+    </div>`).join('');
 }
-function togFaq(i){document.getElementById('fq'+i).classList.toggle('on');document.getElementById('fa'+i).classList.toggle('on');}
 
-function copyTxt(t){navigator.clipboard.writeText(t).then(function(){showToast('✅ تم النسخ');});}
-function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2600);}
-
-loadPlans();
+window.onload=loadPlans;
 </script>
 </body>
 </html>
