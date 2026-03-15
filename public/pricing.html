@@ -501,23 +501,23 @@ function drawQR(idx) {
       return;
     }
 
-    // 1. تحديد أبعاد ثابتة للـ Canvas لتجنب التمدد المشوه
-    c.width = 250; 
-    c.height = 250;
+    // --- الحل الجذري هنا ---
+    // 1. إعطاء الـ Canvas أبعاداً حقيقية مربعة وكبيرة كمنطقة عمل
+    c.width = 300; 
+    c.height = 300;
 
-    // 2. الرسم بحجم أصغر (180) لترك فراغ 35px من كل جهة كمنطقة أمان
     try {
-      QRAman.draw(c, m.walletNumber, 180, '🛡️');
+      // 2. الرسم بحجم 200 داخل مساحة 300 يضمن وجود هامش أمان أبيض (50px) من كل جهة
+      QRAman.draw(c, m.walletNumber, 200, '🛡️');
       
-      // 3. ضبط الـ CSS برمجياً لضمان التوسط
-      c.style.display = 'block';
-      c.style.margin = 'auto';
-      c.style.maxWidth = '100%';
+      // 3. منع الـ CSS من قص أي شيء
+      c.style.width = '100%';
       c.style.height = 'auto';
+      c.style.objectFit = 'contain'; // يضمن عدم تمدد الصورة خارج حدودها
       
       c._drawn = true;
     } catch (e) {
-      console.error("QR Error:", e);
+      console.error("خطأ في رسم الباركود:", e);
     }
   }
   setTimeout(function() { attempt(15); }, 500);
