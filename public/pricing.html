@@ -490,22 +490,46 @@ function buildTabs(){
   }
 }
 
-function drawQR(idx){
-  var m=payMethods[idx];
-  if(!m||m.type!=='wallet'||!m.walletNumber)return;
-  function attempt(tries){
-    var c=document.getElementById('qr-c-'+idx);
-    if(!c){if(tries>0)setTimeout(function(){attempt(tries-1);},100);return;}
-    var overlay=document.getElementById('pay-overlay');
-    var rect=c.getBoundingClientRect();
-    if(rect.width===0||rect.height===0){
-      if(tries>0)requestAnimationFrame(function(){attempt(tries-1);});
+function drawQR(idx) {
+  var m = payMethods[idx];
+  if (!m || m.type !== 'wallet' || !m.walletNumber) return;
+
+  function attempt(tries) {
+    var c = document.getElementById('qr-c-' + idx);
+    if (!c) {
+      if (tries > 0) setTimeout(function() { attempt(tries - 1); }, 100);
       return;
     }
-    QRAman.draw(c,m.walletNumber,220,'🛡️');
-    c._drawn=true;
+
+    var rect = c.getBoundingClientRect();
+    // التحقق من أن العنصر أصبح مرئياً وله أبعاد
+    if (rect.width === 0 || rect.height === 0) {
+      if (tries > 0) requestAnimationFrame(function() { attempt(tries - 1); });
+      return;
+    }
+
+    // التعديل الجوهري هنا:
+    // 1. استخدام حجم 180 بدلاً من 220 لترك مساحة بيضاء (Margin) تمنع القص.
+    // 2. تصفير الـ Canvas قبل الرسم لضمان عدم التداخل.
+    c.width = 200; 
+    c.height = 200;
+    
+    try {
+      QRAman.draw(c, m.walletNumber, 180, '🛡️');
+      
+      // التأكد من أن الـ CSS يجعله يملأ الحاوية بشكل صحيح
+      c.style.width = '100%';
+      c.style.height = 'auto';
+      c.style.display = 'block';
+      
+      c._drawn = true;
+    } catch (e) {
+      console.error("QR Draw Error:", e);
+    }
   }
-  setTimeout(function(){attempt(10);},350);
+  
+  // زيادة وقت التأخير قليلاً لضمان فتح الـ Modal بالكامل
+  setTimeout(function() { attempt(15); }, 450);
 }
 
 function switchTab(btn,idx){
