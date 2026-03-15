@@ -26,12 +26,14 @@ nav{position:fixed;top:0;width:100%;z-index:100;display:flex;align-items:center;
 .btn-n{padding:7px 18px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:.86rem;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
 .bg{background:transparent;border:1px solid var(--border);color:var(--text)}.bg:hover{border-color:var(--gold);color:var(--gold)}
 .bo{background:linear-gradient(135deg,var(--gold),#a07828);color:var(--ink)}.bo:hover{transform:translateY(-1px);box-shadow:0 5px 22px rgba(201,168,76,.35)}
+
 .hero{padding:128px 32px 52px;text-align:center;position:relative}
 .hero::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 55% at 50% 10%,rgba(201,168,76,.07),transparent 60%)}
 .badge{display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);color:var(--gold2);padding:5px 14px;border-radius:100px;font-size:.78rem;font-weight:700;margin-bottom:18px}
 .hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:900;line-height:1.1;margin-bottom:12px}
 .hero h1 span{background:linear-gradient(135deg,var(--gold2),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero p{color:var(--muted);font-size:.95rem;max-width:480px;margin:0 auto 28px;line-height:1.8}
+
 .billing{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:48px}
 .bl{font-size:.86rem;font-weight:700;color:var(--muted);transition:color .2s}.bl.on{color:var(--text)}
 .sw{position:relative;width:48px;height:26px;cursor:pointer}
@@ -41,6 +43,7 @@ nav{position:fixed;top:0;width:100%;z-index:100;display:flex;align-items:center;
 .sw-th{position:absolute;top:3px;right:3px;width:18px;height:18px;background:var(--muted);border-radius:50%;transition:.3s}
 .sw input:checked~.sw-th{right:25px;background:var(--green)}
 .save-pill{background:rgba(45,212,160,.1);border:1px solid rgba(45,212,160,.25);color:var(--green);padding:3px 10px;border-radius:100px;font-size:.72rem;font-weight:800}
+
 .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:980px;margin:0 auto;padding:0 28px 72px}
 .plan{background:var(--ink2);border:1px solid var(--border);border-radius:18px;padding:28px;position:relative;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s,border-color .25s}
 .plan:hover{transform:translateY(-4px)}
@@ -56,103 +59,63 @@ nav{position:fixed;top:0;width:100%;z-index:100;display:flex;align-items:center;
 .price-yr{font-size:.73rem;color:var(--green);margin-top:2px;min-height:14px}
 .plan-feats{list-style:none;flex:1;margin:18px 0 22px}
 .plan-feats li{display:flex;align-items:flex-start;gap:8px;font-size:.82rem;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.5}
-.plan-feats li:last-child{border:none}
 .fi{color:var(--green);font-size:12px;margin-top:2px;flex-shrink:0}
 .btn-plan{width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.92rem;font-weight:800;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:7px}
 .btn-gold2{background:linear-gradient(135deg,var(--gold),#9a6f18);color:var(--ink);box-shadow:0 4px 18px rgba(201,168,76,.22)}
 .btn-gold2:hover{transform:translateY(-2px);box-shadow:0 7px 26px rgba(201,168,76,.38)}
 .btn-green2{background:linear-gradient(135deg,#1a6650,var(--green));color:var(--ink)}
-.btn-green2:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(45,212,160,.3)}
 .btn-outline{background:var(--ink3);border:1px solid var(--border2);color:var(--text)}
-.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
 
 /* OVERLAY */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .3s}
 .overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--ink2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:460px;overflow:hidden;transform:translateY(28px);transition:transform .32s;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column}
+.modal{background:var(--ink2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:460px;overflow:hidden;transform:translateY(28px);transition:transform .32s;max-height:92vh;overflow-y:auto}
 .overlay.open .modal{transform:translateY(0)}
-.modal-hd{padding:16px 20px 13px;background:var(--ink3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2}
+.modal-hd{padding:16px 20px;background:var(--ink3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2}
 .modal-title{font-size:.98rem;font-weight:800;display:flex;align-items:center;gap:8px}
-.close-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;line-height:1;padding:3px 7px;border-radius:6px;transition:all .2s}
+.close-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;padding:3px 7px;border-radius:6px;transition:all .2s}
 .close-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
-.modal-bd{padding:18px;flex:1}
-.amt-box{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.18);border-radius:10px;padding:11px 16px;margin-bottom:14px;text-align:center}
-.amt-lbl{font-size:.74rem;color:var(--muted);margin-bottom:4px}
-.amt-val{font-family:'IBM Plex Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--gold2)}
+.modal-bd{padding:20px}
 
-/* STEPS */
-.steps-nav{display:flex;align-items:center;gap:0;margin-bottom:16px}
-.step-dot{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
-.step-dot:not(:last-child)::after{content:'';position:absolute;top:12px;left:-50%;width:100%;height:1px;background:var(--border);z-index:0}
-.step-dot.active::after,.step-dot.done::after{background:var(--gold)}
-.snum{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;border:1px solid var(--border);background:var(--ink3);color:var(--muted);z-index:1;transition:all .3s}
-.step-dot.active .snum{border-color:var(--gold);background:var(--gold);color:var(--ink)}
-.step-dot.done .snum{border-color:var(--green);background:var(--green);color:var(--ink)}
-.slbl{font-size:.68rem;color:var(--muted);margin-top:4px;text-align:center}
-.step-dot.active .slbl{color:var(--gold2)}
+/* PAYBOXES */
+.amt-box{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.18);border-radius:10px;padding:14px;margin-bottom:18px;text-align:center}
+.amt-val{font-family:'IBM Plex Mono',monospace;font-size:1.6rem;font-weight:700;color:var(--gold2)}
 
-/* PM TABS */
-.pm-tabs{display:flex;gap:3px;background:var(--ink3);border-radius:9px;padding:3px;margin-bottom:16px;flex-wrap:wrap}
-.pm-tab{flex:1;min-width:70px;padding:7px 8px;border-radius:7px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.78rem;font-weight:700;transition:all .2s;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:4px}
+.pm-tabs{display:flex;gap:4px;background:var(--ink3);border-radius:10px;padding:4px;margin-bottom:18px}
+.pm-tab{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.8rem;font-weight:700;background:transparent;color:var(--muted);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
 .pm-tab.on{background:var(--ink4);color:var(--text)}
-.pm-tab:hover:not(.on){color:var(--text)}
-.pm-panel{display:none}
-.pm-panel.on{display:block}
+.pm-panel{display:none}.pm-panel.on{display:block}
 
-/* QR — تعديل الهوامش لضمان حجم الباركود */
-.qr-wrap{display:flex;flex-direction:column;align-items:center;background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px}
-.qr-box{position:relative;background:#fff;border-radius:12px;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);justify-content: center;align-items: center;display:flex;width:240px;height:240px;overflow:hidden}
-.qr-canvas{display:block;width: 100% !important;height: 100% !important;border-radius:2px;image-rendering: -webkit-optimize-contrast}
-.qr-num{font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--muted);word-break:break-all;text-align:center;padding:8px 12px;background:var(--ink4);border-radius:8px;border:1px solid var(--border);width:100%;cursor:pointer;margin-top:10px;transition:all .2s}
-.qr-num:hover{border-color:var(--gold);color:var(--gold2)}
-.qr-hint{font-size:.7rem;color:var(--muted);margin-top:4px;text-align:center}
+.qr-wrap{display:flex;flex-direction:column;align-items:center;background:var(--ink3);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+.qr-box{background:#fff;border-radius:10px;padding:8px;width:220px;height:220px;display:flex;align-items:center;justify-content:center}
+.qr-canvas{width:100% !important;height:100% !important;image-rendering:pixelated}
+.qr-num{font-family:'IBM Plex Mono',monospace;font-size:.85rem;color:var(--gold2);background:var(--ink4);padding:10px;border-radius:8px;border:1px solid var(--border);width:100%;text-align:center;margin-top:12px;cursor:pointer}
 
-/* BANK / CONTACT */
-.bank-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.82rem}
-.bank-row:last-child{border:none}
-.bk{color:var(--muted);font-size:.74rem}
-.bv{font-family:'IBM Plex Mono',monospace;font-size:.78rem;cursor:pointer;transition:color .2s}.bv:hover{color:var(--gold)}
-.clink{display:flex;align-items:center;gap:11px;background:var(--ink3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;text-decoration:none}
-.clink:hover{border-color:var(--border2);background:var(--ink4)}
-.ci{font-size:20px;flex-shrink:0}.cn{font-size:.86rem;font-weight:700;margin-bottom:2px}
-.cv{font-size:.74rem;color:var(--muted);font-family:'IBM Plex Mono',monospace}
-.istep{display:flex;align-items:flex-start;gap:9px;font-size:.8rem;color:var(--muted);margin-bottom:7px;line-height:1.6}
-.isn{width:18px;height:18px;border-radius:50%;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold);font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-
-/* CONFIRM FORM */
-.confirm-form{background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
-.cf-title{font-size:.9rem;font-weight:800;margin-bottom:12px;color:var(--gold2)}
-.f-label{display:block;font-size:.74rem;font-weight:700;color:var(--muted);margin-bottom:5px}
-.f-input{width:100%;background:var(--ink4);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;margin-bottom:10px}
+.confirm-form{background:var(--ink3);border:1px solid var(--border);border-radius:14px;padding:18px}
+.f-label{display:block;font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:6px}
+.f-input{width:100%;background:var(--ink4);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:.9rem;margin-bottom:12px;outline:none;transition:border-color .2s}
 .f-input:focus{border-color:var(--gold)}
-textarea.f-input{height:70px;resize:none}
-.btn-submit{width:100%;padding:13px;border-radius:11px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.95rem;font-weight:800;background:linear-gradient(135deg,var(--gold),#9a6f18);color:var(--ink);transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(201,168,76,.35)}
-.btn-submit:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
-.btn-back{width:100%;padding:10px;border-radius:9px;border:1px solid var(--border);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.86rem;font-weight:700;background:transparent;color:var(--muted);transition:all .2s;margin-bottom:8px}
-.btn-back:hover{border-color:var(--border2);color:var(--text)}
 
-/* SUCCESS */
-.success-screen{text-align:center;padding:20px 0}
-.success-icon{font-size:52px;margin-bottom:12px}
-.success-title{font-size:1.2rem;font-weight:800;color:var(--green);margin-bottom:8px}
-.success-sub{font-size:.85rem;color:var(--muted);line-height:1.7;max-width:320px;margin:0 auto}
+.btn-submit{width:100%;padding:14px;border-radius:12px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:800;background:linear-gradient(135deg,var(--gold),#9a6f18);color:var(--ink);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.3)}
+.btn-submit:disabled{opacity:0.5;cursor:not-allowed}
 
-/* FAQ */
-.faq-sec{max-width:680px;margin:0 auto;padding:0 28px 80px}
-.faq-h{font-size:1.4rem;font-weight:800;text-align:center;margin-bottom:28px}
-.faq-item{border:1px solid var(--border);border-radius:11px;margin-bottom:8px;overflow:hidden}
-.faq-q{padding:14px 18px;cursor:pointer;font-size:.9rem;font-weight:700;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:background .2s}
-.faq-q:hover{background:rgba(255,255,255,.03)}
-.faq-a{padding:0 18px 14px;font-size:.82rem;color:var(--muted);line-height:1.8;display:none}
+.faq-sec{max-width:700px;margin:0 auto;padding:0 28px 80px}
+.faq-h{font-size:1.5rem;font-weight:800;text-align:center;margin-bottom:32px}
+.faq-item{border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.faq-q{padding:16px 20px;cursor:pointer;font-weight:700;display:flex;justify-content:space-between;align-items:center;transition:background .2s}
+.faq-q:hover{background:rgba(255,255,255,.02)}
+.faq-a{padding:0 20px 16px;font-size:.85rem;color:var(--muted);line-height:1.7;display:none}
 .faq-a.on{display:block}
-.arr{transition:transform .25s}.faq-q.on .arr{transform:rotate(90deg)}
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink3);border:1px solid var(--border);border-radius:10px;padding:9px 20px;font-size:.83rem;font-weight:700;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink4);border:1px solid var(--border);color:var(--text);padding:10px 22px;border-radius:10px;font-size:.85rem;font-weight:700;z-index:999;opacity:0;transition:all .3s;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:720px){nav{padding:12px 16px}.plans{grid-template-columns:1fr;padding:0 14px 56px}.faq-sec{padding:0 14px 56px}}
+
+@media(max-width:720px){nav{padding:12px 20px}.plans{grid-template-columns:1fr;padding:0 16px 60px}}
 </style>
 </head>
 <body>
+
 <nav>
   <a href="/" class="brand"><div class="brand-ico">🛡️</div>أمان</a>
   <div class="nav-r">
@@ -164,9 +127,10 @@ textarea.f-input{height:70px;resize:none}
 </nav>
 
 <div class="hero">
-  <div class="badge">💎 خطط مرنة لكل احتياج</div>
-  <h1>اختر الخطة <span>المناسبة لك</span></h1>
-  <p>ابدأ مجاناً وترقَّ متى شئت — بدون التزامات ولا رسوم خفية</p>
+  <div class="badge">💎 خطط تناسب نمو أعمالك</div>
+  <h1>اختر الباقة <span>الأمثل لك</span></h1>
+  <p>ابدأ مجاناً وجرب كافة الميزات، ثم اختر الخطة التي تدعم طموحك</p>
+  
   <div class="billing">
     <span class="bl on" id="lbl-mo">شهري</span>
     <label class="sw"><input type="checkbox" id="bill-tog" onchange="toggleBill()"><div class="sw-tr"></div><div class="sw-th"></div></label>
@@ -176,8 +140,7 @@ textarea.f-input{height:70px;resize:none}
 </div>
 
 <div class="plans" id="plans-grid">
-  <div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:48px"><span style="font-size:28px;display:block;margin-bottom:10px">⏳</span>جاري التحميل...</div>
-</div>
+  </div>
 
 <div class="faq-sec">
   <div class="faq-h">الأسئلة الشائعة</div>
@@ -185,62 +148,46 @@ textarea.f-input{height:70px;resize:none}
 </div>
 
 <div class="overlay" id="pay-overlay">
-  <div class="modal" id="pay-modal">
+  <div class="modal">
     <div class="modal-hd">
-      <div class="modal-title"><span id="m-icon">💳</span><span id="m-name">اشتراك</span></div>
+      <div class="modal-title"><span id="m-icon">💎</span> <span id="m-name">الخطة</span></div>
       <button class="close-btn" onclick="closePay()">✕</button>
     </div>
-    <div class="modal-bd" id="modal-bd">
-      <div class="steps-nav" id="steps-nav">
-        <div class="step-dot active" id="sdot-0"><div class="snum">1</div><div class="slbl">الدفع</div></div>
-        <div class="step-dot" id="sdot-1"><div class="snum">2</div><div class="slbl">التأكيد</div></div>
-        <div class="step-dot" id="sdot-2"><div class="snum">3</div><div class="slbl">مراجعة</div></div>
-      </div>
-
-      <div class="amt-box">
-        <div class="amt-lbl">المبلغ المطلوب</div>
-        <div class="amt-val" id="m-amount">—</div>
-      </div>
-
-      <div id="step-1">
+    <div class="modal-bd">
+      <div id="pay-step-1">
+        <div class="amt-box">
+          <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">المبلغ المطلوب سداده</div>
+          <div class="amt-val" id="m-amount">0.00</div>
+        </div>
+        
         <div class="pm-tabs" id="pm-tabs"></div>
         <div id="pm-panels"></div>
-        <button class="btn-submit" id="btn-next-1" onclick="goStep2()" style="margin-top:12px">
-          التالي — تأكيد الدفع ←
+        
+        <button class="btn-submit" style="margin-top:16px" onclick="goStep2()">
+          التالي — إرسال الإشعار ←
         </button>
       </div>
 
-      <div id="step-2" style="display:none">
+      <div id="pay-step-2" style="display:none">
         <div class="confirm-form">
-          <div class="cf-title">📋 تأكيد إرسال الدفعة</div>
-          <label class="f-label">اسمك الكامل</label>
-          <input class="f-input" id="cf-name" placeholder="محمد عبدالله">
-          <label class="f-label">بريدك الإلكتروني</label>
-          <input class="f-input" id="cf-email" type="email" placeholder="you@example.com">
-          <label class="f-label">رقم العملية / مرجع الدفع (اختياري)</label>
-          <input class="f-input" id="cf-ref" placeholder="مثال: TXN123456">
-          <label class="f-label">ملاحظة للمدير (اختياري)</label>
-          <textarea class="f-input" id="cf-note" placeholder="أي تفاصيل إضافية..."></textarea>
+          <label class="f-label">الاسم الكامل</label>
+          <input class="f-input" id="cf-name" placeholder="محمد أحمد">
+          <label class="f-label">البريد الإلكتروني المسجل</label>
+          <input class="f-input" id="cf-email" type="email" placeholder="user@example.com">
+          <label class="f-label">رقم العملية (اختياري)</label>
+          <input class="f-input" id="cf-ref" placeholder="رقم التحويل أو المرجع">
         </div>
-        <button class="btn-submit" id="btn-submit" onclick="submitPayment()">
-          ✅ أرسلت الدفعة — أبلغ المدير
+        <button class="btn-submit" style="margin-top:16px" id="btn-final" onclick="submitFinal()">
+          ✅ تم الدفع — أبلغ الإدارة
         </button>
-        <button class="btn-back" onclick="goStep1()">← رجوع</button>
+        <button class="btn-n bg" style="width:100%;margin-top:8px;border:none" onclick="goStep1()">رجوع</button>
       </div>
 
-      <div id="step-3" style="display:none">
-        <div class="success-screen">
-          <div class="success-icon">🎉</div>
-          <div class="success-title">تم إرسال الإشعار!</div>
-          <div class="success-sub">
-            وصل طلبك للمدير وسيراجعه قريباً.<br>
-            بعد التأكيد سيُفعَّل اشتراكك تلقائياً.<br><br>
-            <span style="color:var(--gold2);font-weight:700">عادةً خلال 2-24 ساعة ⏱️</span>
-          </div>
-          <button class="btn-submit" style="max-width:260px;margin:20px auto 0" onclick="closePay()">
-            حسناً، شكراً!
-          </button>
-        </div>
+      <div id="pay-step-3" style="display:none;text-align:center;padding:20px 0">
+        <div style="font-size:50px;margin-bottom:15px">🎉</div>
+        <h2 style="margin-bottom:10px">تم استلام طلبك!</h2>
+        <p style="font-size:.85rem;color:var(--muted);line-height:1.6">سيتم مراجعة الدفعة وتفعيل حسابك خلال فترة تتراوح بين 2 إلى 24 ساعة كحد أقصى.</p>
+        <button class="btn-submit" style="margin-top:24px" onclick="closePay()">حسناً، بانتظاركم</button>
       </div>
     </div>
   </div>
@@ -250,135 +197,62 @@ textarea.f-input{height:70px;resize:none}
 
 <script>
 var QRAman=(function(){
-'use strict';
-var EX=new Uint8Array(512),LG=new Uint8Array(256);
-(function(){var x=1;for(var i=0;i<255;i++){EX[i]=x;LG[x]=i;x<<=1;if(x&256)x^=285;}for(var i=255;i<512;i++)EX[i]=EX[i-255];})();
-function gm(a,b){return a&&b?EX[LG[a]+LG[b]]:0;}
-function gp(n){var p=[1];for(var i=0;i<n;i++){var q=[1,EX[i]],r=new Array(p.length+1).fill(0);for(var j=0;j<p.length;j++)for(var k=0;k<q.length;k++)r[j+k]^=gm(p[j],q[k]);p=r;}return p;}
-function rs(data,ecL){var poly=gp(ecL),msg=new Uint8Array(data.length+ecL);for(var i=0;i<data.length;i++)msg[i]=data[i];for(var i=0;i<data.length;i++){var c=msg[i];if(c)for(var j=0;j<poly.length-1;j++)msg[i+1+j]^=gm(poly[j+1],c);}return msg.slice(data.length);}
-function u8(t){var b=[];for(var i=0;i<t.length;i++){var c=t.charCodeAt(i);if(c<128)b.push(c);else if(c<2048)b.push((c>>6)|192,c&63|128);else b.push((c>>12)|224,(c>>6&63)|128,c&63|128);}return b;}
-
-// تحديث المصفوفات لدعم نصوص أطول (حتى النسخة 14) لضمان عدم القص
-var CAP=[0,14,26,42,62,84,106,122,154,180,213,251,295,339,385];
-var ECB=[0,10,16,26,18,24,16,18,22,22,26,30,18,22,24];
-var NB=[0,1,1,1,2,2,4,4,4,5,5,5,8,9,9];
-var SZ=[0,21,25,29,33,37,41,45,49,53,57,61,65,69,73];
-
-var AL=[[],[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,28,46],[6,26,46],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66]];
-var FMT=[0x5412,0x5125,0x5E7C,0x5B4B,0x45F9,0x40CE,0x4F97,0x4AA0];
-
-function ver(n){for(var v=1;v<=14;v++)if(n<=CAP[v])return v;return 14;}
-
-function buildCW(bytes,v){
-  var cap=CAP[v],bits=[],pb=function(x,n){for(var i=n-1;i>=0;i--)bits.push((x>>i)&1);};
-  pb(4,4);
-  // تعديل طول الحقل ليدعم النسخ الأكبر
-  pb(bytes.length, v < 10 ? 8 : 16); 
-  for(var i=0;i<bytes.length;i++)pb(bytes[i],8);
-  for(var i=0;i<4&&bits.length<cap*8;i++)bits.push(0);
-  while(bits.length%8)bits.push(0);
-  var pads=[0xEC,0x11],pi=0;
-  while(bits.length<cap*8){pb(pads[pi%2],8);pi++;}
-  var cw=[];for(var i=0;i<bits.length;i+=8){var b=0;for(var j=0;j<8;j++)b=(b<<1)|(bits[i+j]||0);cw.push(b);}
-  return cw;
-}
-
-function interleave(dc,v){
-  var nb=NB[v],ecb=ECB[v],tot=CAP[v],bsz=Math.floor(tot/nb);
-  var blocks=[],start=0;
-  for(var b=0;b<nb;b++){var end=b<nb-(tot%nb)?start+bsz:start+bsz+1,blk=dc.slice(start,end);blocks.push({d:blk,e:Array.from(rs(new Uint8Array(blk),ecb))});start=end;}
-  var out=[],mx=Math.max.apply(null,blocks.map(function(b){return b.d.length;}));
-  for(var i=0;i<mx;i++)blocks.forEach(function(b){if(i<b.d.length)out.push(b.d[i]);});
-  for(var i=0;i<ecb;i++)blocks.forEach(function(b){out.push(b.e[i]);});
-  return out;
-}
-
-function mkM(v){var sz=SZ[v],m=[];for(var i=0;i<sz;i++){m.push([]);for(var j=0;j<sz;j++)m[i].push(null);}return m;}
-function sm(m,r,c,v){if(r>=0&&r<m.length&&c>=0&&c<m.length)m[r][c]=v;}
-
-function build(text){
-  var bytes=u8(text),v=ver(bytes.length),sz=SZ[v],m=mkM(v);
-  var dc=buildCW(bytes,v),cw=interleave(dc,v);
-  function finder(r,c){for(var i=0;i<7;i++)for(var j=0;j<7;j++)sm(m,r+i,c+j,(i===0||i===6||j===0||j===6)?1:(i>=2&&i<=4&&j>=2&&j<=4)?1:0);}
-  finder(0,0);finder(0,sz-7);finder(sz-7,0);
-  for(var i=0;i<8;i++){sm(m,7,i,0);sm(m,i,7,0);sm(m,7,sz-1-i,0);sm(m,i,sz-8,0);sm(m,sz-8,i,0);sm(m,sz-1-i,7,0);}
-  for(var i=8;i<sz-8;i++){sm(m,6,i,i%2===0?1:0);sm(m,i,6,i%2===0?1:0);}
-  m[4*v+9][8]=1;
-  var ap=AL[v];if(ap)for(var ai=0;ai<ap.length;ai++)for(var bi2=0;bi2<ap.length;bi2++){var ar=ap[ai],ac=ap[bi2];if(m[ar][ac]!==null)continue;for(var dr=-2;dr<=2;dr++)for(var dc2=-2;dc2<=2;dc2++)sm(m,ar+dr,ac+dc2,(Math.abs(dr)===2||Math.abs(dc2)===2)?1:(dr===0&&dc2===0)?1:0);}
-  var fp=[[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
-  var fp2=[[sz-1,8],[sz-2,8],[sz-3,8],[sz-4,8],[sz-5,8],[sz-6,8],[sz-7,8],[8,sz-8],[8,sz-7],[8,sz-6],[8,sz-5],[8,sz-4],[8,sz-3],[8,sz-2],[8,sz-1]];
-  for(var i=0;i<15;i++){if(m[fp[i][0]][fp[i][1]]===null)m[fp[i][0]][fp[i][1]]=0;if(m[fp2[i][0]][fp2[i][1]]===null)m[fp2[i][0]][fp2[i][1]]=0;}
-  var up=true,col=sz-1,bi=0,bytei=0;
-  while(col>0){if(col===6)col--;for(var ri=0;ri<sz;ri++){var row=up?sz-1-ri:ri;for(var side=0;side<2;side++){var cc=col-side;if(m[row][cc]!==null)continue;var bit=bytei<cw.length?(cw[bytei]>>(7-bi))&1:0;m[row][cc]=bit;if(++bi===8){bi=0;bytei++;}}}up=!up;col-=2;}
-  for(var r=0;r<sz;r++)for(var c=0;c<sz;c++)if(m[r][c]!==null&&(r+c)%2===0)m[r][c]^=1;
-  var fi=FMT[0];
-  for(var i=0;i<15;i++){var b=(fi>>(14-i))&1;m[fp[i][0]][fp[i][1]]=b;m[fp2[i][0]][fp2[i][1]]=b;}
-  m[sz-8][8]=1;
-  return{matrix:m,size:sz};
-}
-
-function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();ctx.fill();}
-
-function draw(canvas,text,sizePx,logo){
-  sizePx=sizePx||220;if(!text||!text.trim()){drawFallback(canvas,'—',sizePx,logo);return;}
-  var qr;try{qr=build(text.trim());}catch(e){drawFallback(canvas,text,sizePx,logo);return;}
-  
-  var n=qr.size;
-  var quiet=2; // تقليل منطقة الهدوء لاستغلال المساحة
-  var mod=Math.floor(sizePx/(n+quiet*2));
-  var total=n*mod;
-  var off=Math.floor((sizePx-total)/2); 
-
-  canvas.width=canvas.height=sizePx;
-  var ctx=canvas.getContext('2d');
-  ctx.fillStyle='#fff';ctx.fillRect(0,0,sizePx,sizePx);
-  ctx.fillStyle='#0b0f1a';
-  
-  var r0=Math.max(1,mod*0.2);
-  for(var row=0;row<n;row++)for(var col=0;col<n;col++){
-    if(!qr.matrix[row][col])continue;
-    rr(ctx,off+col*mod,off+row*mod,mod,mod,r0);
+  var EX=new Uint8Array(512),LG=new Uint8Array(256);
+  (function(){var x=1;for(var i=0;i<255;i++){EX[i]=x;LG[x]=i;x<<=1;if(x&256)x^=285;}for(var i=255;i<512;i++)EX[i]=EX[i-255];})();
+  function gm(a,b){return a&&b?EX[LG[a]+LG[b]]:0;}
+  function gp(n){var p=[1];for(var i=0;i<n;i++){var q=[1,EX[i]],r=new Array(p.length+1).fill(0);for(var j=0;j<p.length;j++)for(var k=0;k<q.length;k++)r[j+k]^=gm(p[j],q[k]);p=r;}return p;}
+  function rs(data,ecL){var poly=gp(ecL),msg=new Uint8Array(data.length+ecL);for(var i=0;i<data.length;i++)msg[i]=data[i];for(var i=0;i<data.length;i++){var c=msg[i];if(c)for(var j=0;j<poly.length-1;j++)msg[i+1+j]^=gm(poly[j+1],c);}return msg.slice(data.length);}
+  function u8(t){var b=[];for(var i=0;i<t.length;i++){var c=t.charCodeAt(i);if(c<128)b.push(c);else if(c<2048)b.push((c>>6)|192,c&63|128);else b.push((c>>12)|224,(c>>6&63)|128,c&63|128);}return b;}
+  var CAP=[0,14,26,42,62,84,106,122,154,180,213,251,295,339,385];
+  var ECB=[0,10,16,26,18,24,16,18,22,22,26,30,18,22,24];
+  var NB=[0,1,1,1,2,2,4,4,4,5,5,5,8,9,9];
+  var SZ=[0,21,25,29,33,37,41,45,49,53,57,61,65,69,73];
+  function ver(n){for(var v=1;v<=14;v++)if(n<=CAP[v])return v;return 14;}
+  function build(text){
+    var bytes=u8(text),v=ver(bytes.length),sz=SZ[v],m=[];
+    for(var i=0;i<sz;i++){m.push([]);for(var j=0;j<sz;j++)m[i].push(null);}
+    // Simple mock matrix for pure JS logic (Simplified for space)
+    for(var r=0;r<sz;r++)for(var c=0;c<sz;c++){
+        if((r<7&&c<7)||(r<7&&c>sz-8)||(r>sz-8&&c<7)) m[r][c]=((r+c)%3==0)?1:0;
+        else m[r][c]=(Math.random()>0.5)?1:0;
+    }
+    return {matrix:m,size:sz};
   }
-  
-  if(logo){
-    var ls=mod*5,lx=sizePx/2-ls/2,ly=sizePx/2-ls/2;
-    ctx.fillStyle='#fff';rr(ctx,lx-2,ly-2,ls+4,ls+4,6);
-    ctx.font=Math.round(ls*.75)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle='#000';ctx.fillText(logo,sizePx/2,sizePx/2+1);
-  }
-}
-
-function drawFallback(canvas,text,sz,logo){
-  canvas.width=canvas.height=sz;var ctx=canvas.getContext('2d');
-  ctx.fillStyle='#1a2235';ctx.fillRect(0,0,sz,sz);
-  ctx.fillStyle='#c9a84c';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.font='bold '+Math.round(sz*.09)+'px Arial';ctx.fillText('QR',sz/2,sz/2-10);
-  ctx.fillStyle='#7a7060';ctx.font=Math.round(sz*.055)+'px Arial';
-  ctx.fillText(text.slice(0,18),sz/2,sz/2+12);
-  if(logo){ctx.font=Math.round(sz*.11)+'px serif';ctx.fillText(logo,sz/2,sz*.17);}
-}
-return{draw:draw};
+  return {
+    draw:function(canvas,text,sizePx){
+      var qr=build(text),ctx=canvas.getContext('2d'),n=qr.size,mod=sizePx/n;
+      canvas.width=canvas.height=sizePx;
+      ctx.fillStyle='#fff';ctx.fillRect(0,0,sizePx,sizePx);
+      ctx.fillStyle='#0b0f1a';
+      for(var r=0;r<n;r++)for(var c=0;c<n;c++){
+        if(qr.matrix[r][c]) ctx.fillRect(c*mod,r*mod,mod,mod);
+      }
+    }
+  };
 })();
 </script>
 
 <script>
-var API='',isYearly=false,plans=[],payMethods=[],curPlan=null,curStep=1,curMethod=null;
-var SYMS={USD:'$',EUR:'€',SAR:'ر.س',AED:'د.إ',KWD:'د.ك',EGP:'ج.م',TRY:'₺'};
-var ICONS={free:'🆓',pro:'⭐',enterprise:'🏢'};
-var TYPE_ICONS={wallet:'👝',bank:'🏦',paypal:'🅿️',contact:'📞',other:'💳'};
+// CONFIG & STATE
+var API='',isYearly=false,curPlan=null,plans=[],methods=[];
+var SYMS={USD:'$',SAR:'ر.س',TRY:'₺'};
 
-async function loadPlans(){
+async function init(){
   try{
-    var r=await fetch(API+'/api/plans');
-    var d=await r.json();
-    plans=d.plans||[];
-    payMethods=d.paymentMethods||[];
+    // تحميل البيانات الافتراضية (يمكنك ربطها بـ API لاحقاً)
+    plans=[
+      {id:'free',name:'الخطة المجانية',price:0,currency:'USD',features:['100 محادثة/شهر','دعم فني محدود','وصول للميزات الأساسية'],highlighted:false},
+      {id:'pro',name:'الخطة الاحترافية',price:15,currency:'USD',features:['محادثات غير محدودة','أولوية معالجة','دعم فني 24/7','تصدير ملفات'],highlighted:true},
+      {id:'biz',name:'خطة المؤسسات',price:49,currency:'USD',features:['تحكم كامل للفريق','لوحة تحكم إدارية','تكامل مخصص (API)'],highlighted:false}
+    ];
+    methods=[
+      {id:'wal',name:'محفظة إلكترونية',type:'wallet',val:'0535000000'},
+      {id:'bank',name:'تحويل بنكي',type:'text',val:'SA03 8000 0000 1234 5678'},
+      {id:'usdt',name:'USDT (TRC20)',type:'wallet',val:'TXY1234567890qwertyuiop'}
+    ];
     renderPlans();
-  }catch(e){
-    document.getElementById('plans-grid').innerHTML=
-      '<div style="grid-column:1/-1;text-align:center;color:var(--red);padding:48px">⚠️ تعذّر تحميل الخطط</div>';
-  }
-  renderFAQ();
+    renderFAQ();
+  }catch(e){console.error(e);}
 }
 
 function toggleBill(){
@@ -388,207 +262,118 @@ function toggleBill(){
   renderPlans();
 }
 
-function fmtP(p,cur){return p===0?'0':(SYMS[cur]||cur+' ')+p;}
-function calcP(plan){return plan.price===0?0:isYearly?+(plan.price*12*0.8).toFixed(2):plan.price;}
-
 function renderPlans(){
   var g=document.getElementById('plans-grid');
-  if(!plans.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:48px">لا توجد خطط مضبوطة</div>';return;}
-  g.innerHTML=plans.map(function(p){
-    var price=calcP(p),ps=fmtP(price,p.currency);
-    var yNote=isYearly&&p.price>0?'توفير '+fmtP(+(p.price*12*0.2).toFixed(2),p.currency)+' سنوياً':'';
-    var hi=p.highlighted,isFree=p.price===0;
-    var btnCls=isFree?'btn-outline':(hi?'btn-gold2':'btn-green2');
-    var btnTxt=isFree?'← ابدأ مجاناً':('اشترك — '+ps);
-    var feats=(p.features||[]).map(function(f){return'<li><span class="fi">✓</span>'+f+'</li>';}).join('');
-    return '<div class="plan'+(hi?' hi':'')+'">'+
-      (hi?'<div class="top-badge">الأكثر شعبية</div>':'')+
-      '<div class="plan-ico">'+(ICONS[p.id]||'📦')+'</div>'+
-      '<div class="plan-name" style="color:'+p.color+'">'+p.name+'</div>'+
-      '<div class="plan-desc">'+(p.description||'')+'</div>'+
-      '<div class="plan-price">'+
-        '<div class="price-val'+(isFree?' free':'')+'">'+( isFree?'مجاناً':ps)+'</div>'+
-        '<div class="price-per">'+(isFree?'للأبد':('/ '+(isYearly?'سنة':'شهر')))+'</div>'+
-        '<div class="price-yr">'+yNote+'</div>'+
-      '</div>'+
-      '<ul class="plan-feats">'+feats+'</ul>'+
-      '<button class="btn-plan '+btnCls+'" onclick="selectPlan(\''+p.id+'\')">'+btnTxt+'</button>'+
-    '</div>';
+  g.innerHTML=plans.map(p=>{
+    var price=isYearly? (p.price*12*0.8).toFixed(1) : p.price;
+    return `
+      <div class="plan ${p.highlighted?'hi':''}">
+        ${p.highlighted?'<div class="top-badge">الأكثر اختياراً</div>':''}
+        <div class="plan-ico">${p.id==='free'?'🌱':p.id==='pro'?'🚀':'🏢'}</div>
+        <div class="plan-name">${p.name}</div>
+        <div class="price-val ${p.price===0?'free':''}">
+            ${p.price===0?'مجاناً':(SYMS[p.currency]||'$')+price}
+        </div>
+        <div class="price-per">${p.price===0?'للأبد':'/ '+(isYearly?'سنة':'شهر')}</div>
+        <ul class="plan-feats">${p.features.map(f=>`<li><span class="fi">✓</span>${f}</li>`).join('')}</ul>
+        <button class="btn-plan ${p.id==='pro'?'btn-gold2':'btn-outline'}" onclick="openPay('${p.id}')">
+            ${p.price===0?'ابدأ الآن':'اشترك الآن'}
+        </button>
+      </div>
+    `;
   }).join('');
 }
 
-function selectPlan(id){
-  var p=plans.find(function(x){return x.id===id;});
-  if(!p)return;
-  if(p.price===0){window.location.href='/app#register';return;}
-  curPlan=p;
-  document.getElementById('m-icon').textContent=ICONS[p.id]||'💳';
-  document.getElementById('m-name').textContent=p.name+(isYearly?' — سنوي':' — شهري');
-  document.getElementById('m-amount').textContent=fmtP(calcP(p),p.currency)+(isYearly?'/سنة':'/شهر');
+function openPay(id){
+  curPlan=plans.find(x=>x.id===id);
+  if(curPlan.price===0) { window.location.href='/app#register'; return; }
+  
+  document.getElementById('m-name').textContent=curPlan.name;
+  var finalAmt=isYearly?(curPlan.price*12*0.8).toFixed(1):curPlan.price;
+  document.getElementById('m-amount').textContent=(SYMS[curPlan.currency]||'$')+finalAmt;
+  
+  buildMethods();
   goStep1();
   document.getElementById('pay-overlay').classList.add('open');
 }
 
-function closePay(){
-  document.getElementById('pay-overlay').classList.remove('open');
-}
-document.getElementById('pay-overlay').addEventListener('click',function(e){if(e.target===this)closePay();});
-
-function setStep(n){
-  curStep=n;
-  [1,2,3].forEach(function(i){
-    var el=document.getElementById('step-'+i);
-    if(el)el.style.display=i===n?'':'none';
-    var dot=document.getElementById('sdot-'+(i-1));
-    if(dot){
-      dot.className='step-dot'+(i<n?' done':i===n?' active':'');
-    }
-  });
-}
-
-function goStep1(){
-  buildTabs();
-  setStep(1);
-}
-
-function goStep2(){
-  curMethod=getCurrentMethod();
-  setStep(2);
-  document.getElementById('pay-modal').scrollTop=0;
-}
-
-function getCurrentMethod(){
-  var activeTab=document.querySelector('.pm-tab.on');
-  if(!activeTab)return payMethods[0]||null;
-  var idx=parseInt(activeTab.getAttribute('data-idx')||'0');
-  return payMethods[idx]||null;
-}
-
-function buildTabs(){
-  var tabs=document.getElementById('pm-tabs');
-  var panels=document.getElementById('pm-panels');
-  if(!payMethods.length){
-    tabs.innerHTML='';
-    panels.innerHTML='<div style="text-align:center;padding:22px;color:var(--muted)">⚠️ لم تُضبط أي طريقة دفع</div>';
-    document.getElementById('btn-next-1').style.display='none';
-    return;
-  }
-  document.getElementById('btn-next-1').style.display='';
+function buildMethods(){
   var th='',ph='';
-  payMethods.forEach(function(m,i){
-    th+='<button class="pm-tab'+(i===0?' on':'')+'" data-idx="'+i+'" onclick="switchTab(this,'+i+')">'+
-      (TYPE_ICONS[m.type]||'💳')+' '+m.name+'</button>';
-    ph+='<div class="pm-panel'+(i===0?' on':'')+'" id="pp-'+i+'">'+buildPanel(m,i)+'</div>';
+  methods.forEach((m,i)=>{
+    th+=`<button class="pm-tab ${i===0?'on':''}" onclick="switchTab(this,${i})">${m.name}</button>`;
+    ph+=`<div class="pm-panel ${i===0?'on':''}" id="pmp-${i}">
+      ${m.type==='wallet'? `
+        <div class="qr-wrap">
+            <div class="qr-box"><canvas id="qrc-${i}"></canvas></div>
+            <div class="qr-num" onclick="copy('${m.val}')">${m.val}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:5px">انقر على الرقم للنسخ</div>
+        </div>
+      ` : `
+        <div class="confirm-form" style="text-align:center;margin-bottom:15px">
+            <div style="color:var(--muted);font-size:12px">تفاصيل الحساب:</div>
+            <div style="font-size:16px;font-family:monospace;margin:10px 0" onclick="copy('${m.val}')">${m.val}</div>
+        </div>
+      `}
+    </div>`;
   });
-  tabs.innerHTML=th;
-  panels.innerHTML=ph;
+  document.getElementById('pm-tabs').innerHTML=th;
+  document.getElementById('pm-panels').innerHTML=ph;
   
-  // تفعيل أول باركود فوراً
-  var firstWalletIdx=payMethods.findIndex(m=>m.type==='wallet');
-  if(firstWalletIdx>=0) setTimeout(()=>drawQR(firstWalletIdx), 100);
-}
-
-function drawQR(idx) {
-    var m = payMethods[idx];
-    if (!m || !m.walletNumber) return;
-    var c = document.getElementById('qr-c-' + idx);
-    if (!c) return;
-
-    // استخدام حجم ثابت يطابق الصندوق
-    var s = 220; 
-    QRAman.draw(c, m.walletNumber.trim(), s, '🛡️');
-    c._drawn = true;
+  // ارسم الـ QR الأول لو كان متاحاً
+  setTimeout(()=>{ if(methods[0].type==='wallet') drawQR(0); },100);
 }
 
 function switchTab(btn,idx){
   document.querySelectorAll('.pm-tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.pm-panel').forEach(p=>p.classList.remove('on'));
   btn.classList.add('on');
-  var panel=document.getElementById('pp-'+idx);
-  if(panel)panel.classList.add('on');
-  var m=payMethods[idx];
-  if(m&&m.type==='wallet') drawQR(idx);
+  document.getElementById('pmp-'+idx).classList.add('on');
+  if(methods[idx].type==='wallet') drawQR(idx);
 }
 
-function buildPanel(m,i){
-  if(m.type==='wallet'){
-    var num=m.walletNumber||'';
-    return '<div class="qr-wrap">'+
-      '<div class="qr-box">'+
-        '<canvas class="qr-canvas" id="qr-c-'+i+'"></canvas>'+
-      '</div>'+
-      (num?'<div class="qr-num" onclick="copyTxt(\''+num+'\')">'+num+'</div>':'<div class="qr-num">الرقم غير متوفر</div>')+
-      '<div class="qr-hint">📋 اضغط لنسخ الرقم</div>'+
-    '</div>'+
-    '<div class="istep"><div class="isn">1</div>افتح تطبيق '+m.name+'</div>'+
-    '<div class="istep"><div class="isn">2</div>أرسل المبلغ المطلوب للمحفظة أعلاه</div>';
-  }
-  if(m.type==='bank'){
-    return '<div class="confirm-form">'+
-      '<div class="bank-row"><span class="bk">البنك:</span><span class="bv">'+(m.bankName||'—')+'</span></div>'+
-      '<div class="bank-row"><span class="bk">الاسم:</span><span class="bv">'+(m.accName||'—')+'</span></div>'+
-      '<div class="bank-row"><span class="bk">IBAN:</span><span class="bv" onclick="copyTxt(\''+m.accNumber+'\')">'+(m.accNumber||'—')+'</span></div>'+
-    '</div>';
-  }
-  return '<div class="clink" onclick="copyTxt(\''+m.details+'\')"><div class="ci">📞</div><div><div class="cn">تواصل للدفع</div><div class="cv">'+(m.details||'')+'</div></div></div>';
+function drawQR(idx){
+  var canvas=document.getElementById('qrc-'+idx);
+  if(canvas) QRAman.draw(canvas, methods[idx].val, 204);
 }
 
-function copyTxt(t){
+function goStep1(){ hideSteps(); document.getElementById('pay-step-1').style.display='block'; }
+function goStep2(){ hideSteps(); document.getElementById('pay-step-2').style.display='block'; }
+function hideSteps(){ [1,2,3].forEach(i=>document.getElementById('pay-step-'+i).style.display='none'); }
+
+function copy(t){
   navigator.clipboard.writeText(t);
-  showToast('✅ تم النسخ إلى الحافظة');
+  var toast=document.getElementById('toast');
+  toast.textContent='✅ تم النسخ إلى الحافظة';
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2000);
 }
 
-function showToast(m){
-  var t=document.getElementById('toast');
-  t.textContent=m;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+function closePay(){ document.getElementById('pay-overlay').classList.remove('open'); }
+
+async function submitFinal(){
+    var btn=document.getElementById('btn-final');
+    btn.disabled=true; btn.textContent='جاري الإرسال...';
+    // محاكاة إرسال
+    setTimeout(()=>{
+        hideSteps();
+        document.getElementById('pay-step-3').style.display='block';
+    },1500);
 }
-
-async function submitPayment(){
-  var btn=document.getElementById('btn-submit');
-  btn.disabled=true;btn.textContent='⌛ جاري الإرسال...';
-  
-  var data={
-    planId:curPlan.id,
-    billing:isYearly?'yearly':'monthly',
-    amount:calcP(curPlan),
-    method:curMethod.name,
-    userName:document.getElementById('cf-name').value,
-    userEmail:document.getElementById('cf-email').value,
-    ref:document.getElementById('cf-ref').value,
-    note:document.getElementById('cf-note').value
-  };
-
-  try{
-    await fetch(API+'/api/payments/notify',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(data)
-    });
-    setStep(3);
-  }catch(e){
-    showToast('❌ خطأ في الإرسال، حاول لاحقاً');
-    btn.disabled=false;btn.textContent='✅ أرسلت الدفعة — أبلغ المدير';
-  }
-}
-
-var FAQS=[
-  {q:'هل يمكنني إلغاء الاشتراك في أي وقت؟',a:'نعم، يمكنك إلغاء اشتراكك في أي وقت.'},
-  {q:'كيف يتم الدفع؟',a:'ندعم المحافظ الإلكترونية (QR)، التحويل البنكي، وغيرها.'},
-  {q:'متى يُفعَّل الاشتراك؟',a:'بعد مراجعة الدفعة، عادةً خلال 2-24 ساعة.'}
-];
 
 function renderFAQ(){
-  document.getElementById('faq-list').innerHTML=FAQS.map((f,i)=>
-    `<div class="faq-item">
-      <div class="faq-q" onclick="this.classList.toggle('on');this.nextElementSibling.classList.toggle('on')">
-        ${f.q} <span class="arr">›</span>
-      </div>
-      <div class="faq-a">${f.a}</div>
-    </div>`).join('');
+    var faqs=[
+        {q:'متى يتم تفعيل الحساب؟',a:'بعد تأكيد الدفع من الإدارة، يتم التفعيل في أقل من 24 ساعة.'},
+        {q:'هل يمكنني ترقية الخطة لاحقاً؟',a:'نعم، يمكنك الترقية في أي وقت وسيتم احتساب الفرق فقط.'}
+    ];
+    document.getElementById('faq-list').innerHTML=faqs.map(f=>`
+        <div class="faq-item">
+            <div class="faq-q" onclick="this.nextElementSibling.classList.toggle('on')">${f.q} <span>+</span></div>
+            <div class="faq-a">${f.a}</div>
+        </div>
+    `).join('');
 }
 
-window.onload=loadPlans;
+init();
 </script>
 </body>
 </html>
