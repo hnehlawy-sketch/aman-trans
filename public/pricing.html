@@ -263,10 +263,10 @@ function gm(a,b){return a&&b?EX[LG[a]+LG[b]]:0;}
 function gp(n){var p=[1];for(var i=0;i<n;i++){var q=[1,EX[i]],r=new Array(p.length+1).fill(0);for(var j=0;j<p.length;j++)for(var k=0;k<q.length;k++)r[j+k]^=gm(p[j],q[k]);p=r;}return p;}
 function rs(data,ecL){var poly=gp(ecL),msg=new Uint8Array(data.length+ecL);for(var i=0;i<data.length;i++)msg[i]=data[i];for(var i=0;i<data.length;i++){var c=msg[i];if(c)for(var j=0;j<poly.length-1;j++)msg[i+1+j]^=gm(poly[j+1],c);}return msg.slice(data.length);}
 function u8(t){var b=[];for(var i=0;i<t.length;i++){var c=t.charCodeAt(i);if(c<128)b.push(c);else if(c<2048)b.push((c>>6)|192,c&63|128);else b.push((c>>12)|224,(c>>6&63)|128,c&63|128);}return b;}
-var CAP=[0,14,26,42,62,84,106,122,154,180,213];
-var ECB=[0,10,16,26,18,24,16,18,22,22,26];
-var NB=[0,1,1,1,2,2,4,4,4,5,5];
-var SZ=[0,21,25,29,33,37,41,45,49,53,57];
+var CAP=[0,14,26,42,62,84,106,122,154,180,213,251,295,339,385];
+var ECB=[0,10,16,26,18,24,16,18,22,22,26,30,18,22,24];
+var NB=[0,1,1,1,2,2,4,4,4,5,5,5,8,9,9];
+var SZ=[0,21,25,29,33,37,41,45,49,53,57,61,65,69,73];
 var AL=[[[],[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,28,46],[6,26,46]]];
 AL=AL[0];
 var FMT=[0x5412,0x5125,0x5E7C,0x5B4B,0x45F9,0x40CE,0x4F97,0x4AA0];
