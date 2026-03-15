@@ -501,37 +501,27 @@ function drawQR(idx) {
       return;
     }
 
-    var rect = c.getBoundingClientRect();
-    // التحقق من أن العنصر أصبح مرئياً وله أبعاد
-    if (rect.width === 0 || rect.height === 0) {
-      if (tries > 0) requestAnimationFrame(function() { attempt(tries - 1); });
-      return;
-    }
+    // 1. تحديد أبعاد ثابتة للـ Canvas لتجنب التمدد المشوه
+    c.width = 250; 
+    c.height = 250;
 
-    // التعديل الجوهري هنا:
-    // 1. استخدام حجم 180 بدلاً من 220 لترك مساحة بيضاء (Margin) تمنع القص.
-    // 2. تصفير الـ Canvas قبل الرسم لضمان عدم التداخل.
-    c.width = 200; 
-    c.height = 200;
-    
+    // 2. الرسم بحجم أصغر (180) لترك فراغ 35px من كل جهة كمنطقة أمان
     try {
       QRAman.draw(c, m.walletNumber, 180, '🛡️');
       
-      // التأكد من أن الـ CSS يجعله يملأ الحاوية بشكل صحيح
-      c.style.width = '100%';
-      c.style.height = 'auto';
+      // 3. ضبط الـ CSS برمجياً لضمان التوسط
       c.style.display = 'block';
+      c.style.margin = 'auto';
+      c.style.maxWidth = '100%';
+      c.style.height = 'auto';
       
       c._drawn = true;
     } catch (e) {
-      console.error("QR Draw Error:", e);
+      console.error("QR Error:", e);
     }
   }
-  
-  // زيادة وقت التأخير قليلاً لضمان فتح الـ Modal بالكامل
-  setTimeout(function() { attempt(15); }, 450);
+  setTimeout(function() { attempt(15); }, 500);
 }
-
 function switchTab(btn,idx){
   document.querySelectorAll('.pm-tab').forEach(function(t){t.classList.remove('on');});
   document.querySelectorAll('.pm-panel').forEach(function(p){p.classList.remove('on');});
